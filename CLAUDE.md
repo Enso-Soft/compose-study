@@ -32,6 +32,48 @@ launchedeffect/          # ❌ study/ 없음, snake_case 아님
 study/launchedEffect/    # ❌ camelCase
 ```
 
+## MCP Policy
+
+### Serena 사용 규칙 (mcp 도구가 존재한다면)
+**코드 탐색/수정 시 Serena를 기본 도구로 사용합니다.**
+
+1. **파일 읽기 전 항상 `get_symbols_overview` 먼저 호출**
+- 50줄 이상 파일은 전체 Read 금지
+- 필요한 심볼만 `find_symbol(include_body=True)`로 조회
+2. **심볼 수정 시 반드시 Serena 사용**
+- 좋은 예시
+    - find_symbol("ViewModel/onEvent", include_body=True) → replace_symbol_body("ViewModel/onEvent", new_body)
+- 나쁜 예시
+    - Read(entire_file) → Edit(old_string, new_string)
+
+3. **리팩토링 시 참조 추적 필수**
+- find_referencing_symbols("OldName") → rename_symbol("OldName", "NewName")
+
+4. **Fallback 조건**
+- Serena 타임아웃/에러 시
+- 비코드 파일 (yaml, json, md 등)
+- 50줄 미만 소형 파일
+
+### Timeout & Retry
+
+| MCP Server | Timeout | Retry | Purpose |
+|------------|---------|-------|---------|
+| sequential-thinking | 180s    | 1 | Complex analysis, planning |
+| context7 | 30s     | 1 | Library documentation lookup |
+| codex-cli | 600s    | 2 | Code discussion, review |
+| exa | 30s     | 1 | Web search |
+| serena | 30s     | 1 | Symbolic code navigation/editing |
+
+### Fallback Strategy
+
+| MCP Server | Fallback Action |
+|-----------|-----------------|
+| sequential-thinking | Use native analysis |
+| context7 | Skip with warning |
+| codex-cli | Single round only |
+| exa | Skip (optional MCP) |
+| serena | Native file/edit tools |
+
 ## 빌드 명령어
 
 ```bash

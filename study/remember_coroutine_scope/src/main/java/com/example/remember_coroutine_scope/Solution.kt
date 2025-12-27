@@ -27,12 +27,6 @@ fun SolutionScreen() {
     var isRunning by remember { mutableStateOf(false) }
     var showComponent by remember { mutableStateOf(true) }
     var statusMessage by remember { mutableStateOf("") }
-    var recompositionCount by remember { mutableIntStateOf(0) }
-
-    // Recomposition 횟수 추적
-    SideEffect {
-        recompositionCount++
-    }
 
     Column(
         modifier = Modifier
@@ -57,7 +51,6 @@ fun SolutionScreen() {
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Recomposition 횟수: $recompositionCount")
                 Text("컴포넌트 표시: $showComponent")
                 Text("카운트다운 상태: ${if (isRunning) "실행 중" else "대기"}")
             }

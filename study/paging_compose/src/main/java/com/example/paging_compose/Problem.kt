@@ -55,12 +55,6 @@ fun ProblemScreen() {
     var newsList by remember { mutableStateOf<List<NewsItem>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var loadingTimeMs by remember { mutableLongStateOf(0L) }
-    var recompositionCount by remember { mutableIntStateOf(0) }
-
-    // Recomposition 추적
-    SideEffect {
-        recompositionCount++
-    }
 
     // 문제: 모든 데이터를 한 번에 로드
     LaunchedEffect(Unit) {
@@ -121,7 +115,6 @@ fun ProblemScreen() {
                         Text("로딩 시간: ${loadingTimeMs}ms")
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("Recomposition: ${recompositionCount}회")
                         Text(
                             if (isLoading) "로딩 중..." else "로드 완료",
                             color = if (isLoading)

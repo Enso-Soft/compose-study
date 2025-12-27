@@ -25,8 +25,14 @@ import kotlinx.coroutines.launch
 fun SolutionScreen() {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    var recompositionCount by remember { mutableIntStateOf(0) }
     var buttonStateChangeCount by remember { mutableIntStateOf(0) }
+
+    // Recomposition 횟수 추적 (참조 객체 패턴 - 무한 루프 방지)
+    val recompositionRef = remember { object { var count = 0 } }
+    var displayRecompositionCount by remember { mutableIntStateOf(0) }
+    SideEffect {
+        recompositionRef.count++
+    }
 
     // 해결책: derivedStateOf 사용!
     // showButton 값이 실제로 변경될 때만 Recomposition 트리거
@@ -36,14 +42,10 @@ fun SolutionScreen() {
         }
     }
 
-    // showButton 변경 횟수 추적
+    // showButton 변경 횟수 추적 & Recomposition 카운트 표시 업데이트
     LaunchedEffect(showButton) {
         buttonStateChangeCount++
-    }
-
-    // Recomposition 횟수 추적
-    SideEffect {
-        recompositionCount++
+        displayRecompositionCount = recompositionRef.count
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -64,7 +66,7 @@ fun SolutionScreen() {
                         color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Recomposition 횟수: $recompositionCount")
+                    Text("Recomposition 횟수: $displayRecompositionCount")
                     Text("showButton 변경 횟수: $buttonStateChangeCount")
                     Text("firstVisibleItemIndex: ${listState.firstVisibleItemIndex}")
                     Text("showButton: $showButton")

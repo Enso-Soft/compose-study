@@ -22,17 +22,25 @@ import androidx.compose.ui.unit.dp
 fun SolutionScreen() {
     var userType by remember { mutableStateOf("Free") }
     var triggerRecompose by remember { mutableIntStateOf(0) }
-    var recompositionCount by remember { mutableIntStateOf(0) }
     var syncCount by remember { mutableIntStateOf(0) }
+
+    // Recomposition 추적용 (참조 객체 패턴 - 무한 루프 방지)
+    val recompositionRef = remember { object { var count = 0 } }
+    var displayRecompositionCount by remember { mutableIntStateOf(0) }
 
     // 올바른 방식: SideEffect 사용
     // 성공적인 Recomposition 후에만 실행됩니다
     SideEffect {
-        recompositionCount++
+        recompositionRef.count++
         ExternalAnalytics.currentUserType = userType
         ExternalAnalytics.updateCount++
         ExternalAnalytics.lastUpdateTime = System.currentTimeMillis()
+    }
+
+    // syncCount와 displayRecompositionCount 업데이트
+    LaunchedEffect(userType) {
         syncCount = ExternalAnalytics.updateCount
+        displayRecompositionCount = recompositionRef.count
     }
 
     Column(
@@ -64,7 +72,7 @@ fun SolutionScreen() {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("사용자 타입: $userType")
-                Text("Recomposition 횟수: $recompositionCount")
+                Text("Recomposition 횟수: $displayRecompositionCount")
                 Text("Analytics 동기화 횟수: $syncCount")
                 Text("Analytics에 저장된 타입: ${ExternalAnalytics.currentUserType}")
             }

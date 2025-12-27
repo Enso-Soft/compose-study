@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ProblemScreen() {
     val context = LocalContext.current
-    var recompositionCount by remember { mutableIntStateOf(0) }
     var composeText by remember { mutableStateOf("Compose 상태") }
 
     // 문제: View를 remember로 외부에서 생성
@@ -33,11 +32,6 @@ fun ProblemScreen() {
             hint = "여기에 입력하세요"
             setText("초기 텍스트")
         }
-    }
-
-    // Recomposition 횟수 추적
-    SideEffect {
-        recompositionCount++
     }
 
     Column(
@@ -68,7 +62,6 @@ fun ProblemScreen() {
                     style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Recomposition 횟수: $recompositionCount")
                 Text("Compose 상태: $composeText")
                 Text("EditText 값: ${editText.text}")
             }

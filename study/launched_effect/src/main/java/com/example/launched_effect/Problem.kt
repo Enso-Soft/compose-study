@@ -21,22 +21,26 @@ import kotlinx.coroutines.launch
 fun ProblemScreen(userId: String = "user123") {
     val scope = rememberCoroutineScope()
     var userData by remember { mutableStateOf<String?>(null) }
-    var recompositionCount by remember { mutableIntStateOf(0) }
+
+    // Recomposition 횟수 추적 (참조 객체 패턴 - 무한 루프 방지)
+    val recompositionRef = remember { object { var count = 0 } }
+    var displayRecompositionCount by remember { mutableIntStateOf(0) }
+    SideEffect {
+        recompositionRef.count++
+    }
+    LaunchedEffect(Unit) {
+        displayRecompositionCount = recompositionRef.count
+    }
 
     // 문제: Recomposition마다 매번 코루틴 실행!
     // 주석을 해제하면 무한 루프 발생
     /*
     scope.launch {
-        println("Fetching data... (count: $recompositionCount)")
+        println("Fetching data... (count: $displayRecompositionCount)")
         delay(500) // 네트워크 요청 시뮬레이션
         userData = "User: $userId (loaded at ${System.currentTimeMillis()})"
     }
     */
-
-    // Recomposition 횟수 추적
-    SideEffect {
-        recompositionCount++
-    }
 
     Column(
         modifier = Modifier
@@ -60,7 +64,7 @@ fun ProblemScreen(userId: String = "user123") {
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Recomposition 횟수: $recompositionCount")
+                Text("Recomposition 횟수: $displayRecompositionCount")
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(userData ?: "데이터 로딩 중...")
             }

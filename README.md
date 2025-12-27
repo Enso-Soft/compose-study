@@ -7,7 +7,7 @@
 ## 📊 학습 진행 현황
 
 ```
-완료된 모듈: 35개 | 전체 커버리지: 약 100%
+완료된 모듈: 37개 | 전체 커버리지: 약 100%
 ```
 
 | 영역 | 상태 | 설명 |
@@ -421,9 +421,11 @@ fun CameraPreview() {
 | 모듈 | 주제 | 실행 명령어 |
 |------|------|------------|
 | 📁 [kotlin_basics](study/kotlin_basics/src/main/java/com/example/kotlin_basics/README.md) | Kotlin 기초 (람다, 확장함수, 널안전성) | `./gradlew :study:kotlin_basics:installDebug` |
+| 📁 [compose_introduction](study/compose_introduction/src/main/java/com/example/compose_introduction/README.md) | Compose 소개, 선언적 UI vs 명령형 UI | `./gradlew :study:compose_introduction:installDebug` |
 | 📁 [composable_function](study/composable_function/src/main/java/com/example/composable_function/README.md) | @Composable 함수, Recomposition | `./gradlew :study:composable_function:installDebug` |
 | 📁 [basic_ui_components](study/basic_ui_components/src/main/java/com/example/basic_ui_components/README.md) | Text, Button, TextField, Icon | `./gradlew :study:basic_ui_components:installDebug` |
 | 📁 [layout_and_modifier](study/layout_and_modifier/src/main/java/com/example/layout_and_modifier/README.md) | Column, Row, Box, Modifier | `./gradlew :study:layout_and_modifier:installDebug` |
+| 📁 [screen_and_component](study/screen_and_component/src/main/java/com/example/screen_and_component/README.md) | Screen vs Component, Stateful/Stateless 분리, 화면 구조 | `./gradlew :study:screen_and_component:installDebug` |
 
 ### Level 2: 상태 관리
 
@@ -433,6 +435,8 @@ fun CameraPreview() {
 | 📁 [remember_saveable](study/remember_saveable/src/main/java/com/example/remember_saveable/README.md) | rememberSaveable, Saver, Parcelize | `./gradlew :study:remember_saveable:installDebug` |
 | 📁 [state_hoisting](study/state_hoisting/src/main/java/com/example/state_hoisting/README.md) | State Hoisting (상태 끌어올리기) | `./gradlew :study:state_hoisting:installDebug` |
 | 📁 [view_model](study/view_model/src/main/java/com/example/view_model/README.md) | ViewModel + Compose 통합 | `./gradlew :study:view_model:installDebug` |
+| 📁 [state_restoration_advanced](study/state_restoration_advanced/src/main/java/com/example/state_restoration_advanced/README.md) | 커스텀 Saver, SavedStateHandle, 프로세스 종료 복원 | `./gradlew :study:state_restoration_advanced:installDebug` |
+| 📁 [state_management_advanced](study/state_management_advanced/src/main/java/com/example/state_management_advanced/README.md) | StateFlow vs SharedFlow vs Channel, collectAsStateWithLifecycle, WhileSubscribed, MVI 패턴 | `./gradlew :study:state_management_advanced:installDebug` |
 
 ### Level 3: Side Effects
 
@@ -444,6 +448,7 @@ fun CameraPreview() {
 | 📁 [side_effect](study/side_effect/src/main/java/com/example/side_effect/README.md) | SideEffect | `./gradlew :study:side_effect:installDebug` |
 | 📁 [derived_state_of](study/derived_state_of/src/main/java/com/example/derived_state_of/README.md) | derivedStateOf | `./gradlew :study:derived_state_of:installDebug` |
 | 📁 [produce_state](study/produce_state/src/main/java/com/example/produce_state/README.md) | produceState | `./gradlew :study:produce_state:installDebug` |
+| 📁 [effect_handlers_advanced](study/effect_handlers_advanced/src/main/java/com/example/effect_handlers_advanced/README.md) | snapshotFlow, rememberUpdatedState, currentRecomposeScope, derivedStateOf vs snapshotFlow | `./gradlew :study:effect_handlers_advanced:installDebug` |
 
 ### Level 4: 성능 최적화
 
@@ -451,18 +456,24 @@ fun CameraPreview() {
 |------|------|------------|
 | 📁 [recomposition](study/recomposition/src/main/java/com/example/recomposition/README.md) | Recomposition 이해 | `./gradlew :study:recomposition:installDebug` |
 | 📁 [stability](study/stability/src/main/java/com/example/stability/README.md) | Stability (@Stable, @Immutable) | `./gradlew :study:stability:installDebug` |
+| 📁 [compose_compiler_metrics](study/compose_compiler_metrics/src/main/java/com/example/compose_compiler_metrics/README.md) | Compiler Metrics & Reports, Strong Skipping Mode | `./gradlew :study:compose_compiler_metrics:installDebug` |
+| 📁 [baseline_profiles](study/baseline_profiles/src/main/java/com/example/baseline_profiles/README.md) | Baseline Profiles, Startup Profiles, AOT 컴파일, Macrobenchmark | `./gradlew :study:baseline_profiles:installDebug` |
 
 ### Level 5: 고급 주제
 
 | 모듈 | 주제 | 실행 명령어 |
 |------|------|------------|
 | 📁 [navigation](study/navigation/src/main/java/com/example/navigation/README.md) | Navigation Compose (Type-Safe) | `./gradlew :study:navigation:installDebug` |
+| 📁 [navigation_3](study/navigation_3/src/main/java/com/example/navigation_3/README.md) | Navigation 3 (Nav3) - 2025 최신 네비게이션 | `./gradlew :study:navigation_3:installDebug` |
 | 📁 [lifecycle_integration](study/lifecycle_integration/src/main/java/com/example/lifecycle_integration/README.md) | Lifecycle Integration | `./gradlew :study:lifecycle_integration:installDebug` |
 | 📁 [preview](study/preview/src/main/java/com/example/preview/README.md) | @Preview, @PreviewParameter, Multipreview | `./gradlew :study:preview:installDebug` |
 | 📁 [animation_basics](study/animation_basics/src/main/java/com/example/animation_basics/README.md) | animate*AsState, AnimatedVisibility, Crossfade | `./gradlew :study:animation_basics:installDebug` |
 | 📁 [animation_advanced](study/animation_advanced/src/main/java/com/example/animation_advanced/README.md) | updateTransition, Animatable, AnimationSpec | `./gradlew :study:animation_advanced:installDebug` |
+| 📁 [shared_element_transition](study/shared_element_transition/src/main/java/com/example/shared_element_transition/README.md) | SharedTransitionLayout, sharedElement, sharedBounds | `./gradlew :study:shared_element_transition:installDebug` |
+| 📁 [animate_bounds](study/animate_bounds/src/main/java/com/example/animate_bounds/README.md) | LookaheadScope, animateBounds, BoundsTransform | `./gradlew :study:animate_bounds:installDebug` |
 | 📁 [scaffold_and_theming](study/scaffold_and_theming/src/main/java/com/example/scaffold_and_theming/README.md) | MaterialTheme, Scaffold, TopAppBar, 다크모드 | `./gradlew :study:scaffold_and_theming:installDebug` |
 | 📁 [compose_testing](study/compose_testing/src/main/java/com/example/compose_testing/README.md) | ComposeTestRule, Semantics, UI 테스트 | `./gradlew :study:compose_testing:installDebug` |
+| 📁 [screenshot_testing](study/screenshot_testing/src/main/java/com/example/screenshot_testing/README.md) | Paparazzi, Roborazzi, 스냅샷 테스트 | `./gradlew :study:screenshot_testing:installDebug` |
 | 📁 [interoperability](study/interoperability/src/main/java/com/example/interoperability/README.md) | AndroidView, ComposeView, 상호운용성 | `./gradlew :study:interoperability:installDebug` |
 | 📁 [deep_link](study/deep_link/src/main/java/com/example/deep_link/README.md) | Deep Link, navDeepLink, URI 처리 | `./gradlew :study:deep_link:installDebug` |
 | 📁 [back_handler](study/back_handler/src/main/java/com/example/back_handler/README.md) | BackHandler, 뒤로가기 처리, Predictive Back | `./gradlew :study:back_handler:installDebug` |
@@ -481,6 +492,27 @@ fun CameraPreview() {
 | 📁 [paging_compose](study/paging_compose/src/main/java/com/example/paging_compose/README.md) | Paging 3, PagingSource, collectAsLazyPagingItems | `./gradlew :study:paging_compose:installDebug` |
 | 📁 [pager](study/pager/src/main/java/com/example/pager/README.md) | HorizontalPager, VerticalPager, PagerState | `./gradlew :study:pager:installDebug` |
 | 📁 [pull_to_refresh](study/pull_to_refresh/src/main/java/com/example/pull_to_refresh/README.md) | PullToRefreshBox, 당겨서 새로고침 | `./gradlew :study:pull_to_refresh:installDebug` |
+| 📁 [flow_layout](study/flow_layout/src/main/java/com/example/flow_layout/README.md) | FlowRow, FlowColumn, 동적 래핑 레이아웃 | `./gradlew :study:flow_layout:installDebug` |
+| 📁 [canvas_drawing](study/canvas_drawing/src/main/java/com/example/canvas_drawing/README.md) | Canvas, drawLine, drawCircle, drawArc, Path, Brush | `./gradlew :study:canvas_drawing:installDebug` |
+| 📁 [adaptive_layout](study/adaptive_layout/src/main/java/com/example/adaptive_layout/README.md) | WindowSizeClass, 반응형 레이아웃, NavigationSuiteScaffold | `./gradlew :study:adaptive_layout:installDebug` |
+| 📁 [custom_modifier](study/custom_modifier/src/main/java/com/example/custom_modifier/README.md) | Modifier.Node, Modifier.composed, 조건부 Modifier | `./gradlew :study:custom_modifier:installDebug` |
+| 📁 [drag_and_drop](study/drag_and_drop/src/main/java/com/example/drag_and_drop/README.md) | dragAndDropSource, dragAndDropTarget, ClipData | `./gradlew :study:drag_and_drop:installDebug` |
+| 📁 [permission_handling](study/permission_handling/src/main/java/com/example/permission_handling/README.md) | rememberPermissionState, Accompanist Permissions, Android 14+ | `./gradlew :study:permission_handling:installDebug` |
+| 📁 [focus_management](study/focus_management/src/main/java/com/example/focus_management/README.md) | FocusRequester, FocusManager, IME Actions, 포커스 스타일링 | `./gradlew :study:focus_management:installDebug` |
+| 📁 [notification_integration](study/notification_integration/src/main/java/com/example/notification_integration/README.md) | NotificationChannel, POST_NOTIFICATIONS, Rich 알림, Progress 알림 | `./gradlew :study:notification_integration:installDebug` |
+| 📁 [image_loading](study/image_loading/src/main/java/com/example/image_loading/README.md) | Coil 3.x, AsyncImage, SubcomposeAsyncImage, 캐싱 | `./gradlew :study:image_loading:installDebug` |
+| 📁 [text_typography](study/text_typography/src/main/java/com/example/text_typography/README.md) | AnnotatedString, InlineContent, LinkAnnotation, TextMeasurer | `./gradlew :study:text_typography:installDebug` |
+| 📁 [media3_player](study/media3_player/src/main/java/com/example/media3_player/README.md) | Media3 ExoPlayer + Compose 통합, PlayerView, 생명주기 관리 | `./gradlew :study:media3_player:installDebug` |
+| 📁 [search_bar](study/search_bar/src/main/java/com/example/search_bar/README.md) | Material3 SearchBar, DockedSearchBar, 디바운스, 필터 칩 | `./gradlew :study:search_bar:installDebug` |
+| 📁 [audio_recording](study/audio_recording/src/main/java/com/example/audio_recording/README.md) | MediaRecorder, RECORD_AUDIO 권한, 녹음 상태 관리, 진폭 시각화 | `./gradlew :study:audio_recording:installDebug` |
+| 📁 [dialog_basics](study/dialog_basics/src/main/java/com/example/dialog_basics/README.md) | AlertDialog, Dialog, 상태 기반 다이얼로그, 입력/선택 다이얼로그 | `./gradlew :study:dialog_basics:installDebug` |
+| 📁 [bottom_sheet_basics](study/bottom_sheet_basics/src/main/java/com/example/bottom_sheet_basics/README.md) | ModalBottomSheet 기초, Boolean 상태로 열기/닫기, 액션 시트 패턴 | `./gradlew :study:bottom_sheet_basics:installDebug` |
+| 📁 [bottom_sheet_advanced](study/bottom_sheet_advanced/src/main/java/com/example/bottom_sheet_advanced/README.md) | ModalBottomSheet, BottomSheetScaffold, SheetState, 중첩 시트 | `./gradlew :study:bottom_sheet_advanced:installDebug` |
+| 📁 [camerax_compose](study/camerax_compose/src/main/java/com/example/camerax_compose/README.md) | CameraX + Compose 통합, PreviewView, ImageCapture, 카메라 전환 | `./gradlew :study:camerax_compose:installDebug` |
+| 📁 [slot_api_pattern](study/slot_api_pattern/src/main/java/com/example/slot_api_pattern/README.md) | Slot API 패턴, Compound Component, Scoped Slots, layoutId | `./gradlew :study:slot_api_pattern:installDebug` |
+| 📁 [semantics_accessibility](study/semantics_accessibility/src/main/java/com/example/semantics_accessibility/README.md) | Semantics Tree, contentDescription, mergeDescendants, liveRegion, traversalOrder, 접근성 테스트 | `./gradlew :study:semantics_accessibility:installDebug` |
+| 📁 [visibility_tracking](study/visibility_tracking/src/main/java/com/example/visibility_tracking/README.md) | Visibility Tracking API (2025), onVisibilityChanged, onLayoutRectChanged, 광고 노출 추적 | `./gradlew :study:visibility_tracking:installDebug` |
+| 📁 [textfield_state](study/textfield_state/src/main/java/com/example/textfield_state/README.md) | TextFieldState, InputTransformation, OutputTransformation, Autofill, SecureTextField | `./gradlew :study:textfield_state:installDebug` |
 
 ### 각 모듈 구조
 

@@ -26,16 +26,21 @@ import kotlinx.coroutines.launch
 fun ProblemScreen() {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    var recompositionCount by remember { mutableIntStateOf(0) }
+
+    // Recomposition 횟수 추적 (참조 객체 패턴 - 무한 루프 방지)
+    val recompositionRef = remember { object { var count = 0 } }
+    var displayRecompositionCount by remember { mutableIntStateOf(0) }
+    SideEffect {
+        recompositionRef.count++
+        // 즉시 표시 업데이트 (derivedStateOf 학습에서는 비교가 중요하므로)
+    }
+    LaunchedEffect(listState.firstVisibleItemIndex) {
+        displayRecompositionCount = recompositionRef.count
+    }
 
     // 문제: derivedStateOf 없이 직접 계산
     // 스크롤할 때마다 이 조건이 다시 평가되고 Recomposition 발생!
     val showButton = listState.firstVisibleItemIndex > 0
-
-    // Recomposition 횟수 추적
-    SideEffect {
-        recompositionCount++
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -55,7 +60,7 @@ fun ProblemScreen() {
                         color = MaterialTheme.colorScheme.error
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Recomposition 횟수: $recompositionCount")
+                    Text("Recomposition 횟수: $displayRecompositionCount")
                     Text("firstVisibleItemIndex: ${listState.firstVisibleItemIndex}")
                     Text("showButton: $showButton")
                 }

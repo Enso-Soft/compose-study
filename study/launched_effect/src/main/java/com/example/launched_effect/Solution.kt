@@ -21,22 +21,24 @@ fun SolutionScreen(initialUserId: String = "user123") {
     var userId by remember { mutableStateOf(initialUserId) }
     var userData by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
-    var recompositionCount by remember { mutableIntStateOf(0) }
     var fetchCount by remember { mutableIntStateOf(0) }
+
+    // Recomposition 횟수 추적 (참조 객체 패턴 - 무한 루프 방지)
+    val recompositionRef = remember { object { var count = 0 } }
+    var displayRecompositionCount by remember { mutableIntStateOf(0) }
+    SideEffect {
+        recompositionRef.count++
+    }
 
     // LaunchedEffect: userId가 변경될 때만 실행
     LaunchedEffect(userId) {
         fetchCount++
+        displayRecompositionCount = recompositionRef.count
         println("Fetching data for $userId (fetch count: $fetchCount)")
         isLoading = true
         delay(1000)
         userData = "User: $userId (loaded at ${System.currentTimeMillis()})"
         isLoading = false
-    }
-
-    // Recomposition 횟수 추적
-    SideEffect {
-        recompositionCount++
     }
 
     Column(
@@ -62,7 +64,7 @@ fun SolutionScreen(initialUserId: String = "user123") {
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Recomposition 횟수: $recompositionCount")
+                Text("Recomposition 횟수: $displayRecompositionCount")
                 Text("API 호출 횟수: $fetchCount")
                 Text("현재 userId: $userId")
             }

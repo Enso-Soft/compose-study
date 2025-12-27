@@ -51,10 +51,14 @@ fun ProblemScreen() {
     problemUpdateCount = ExternalAnalytics.updateCount
     */
 
-    // Recomposition 추적용 (이것은 올바른 SideEffect 사용)
-    var recompositionCount by remember { mutableIntStateOf(0) }
+    // Recomposition 추적용 (참조 객체 패턴 - 무한 루프 방지)
+    val recompositionRef = remember { object { var count = 0 } }
+    var displayRecompositionCount by remember { mutableIntStateOf(0) }
     SideEffect {
-        recompositionCount++
+        recompositionRef.count++
+    }
+    LaunchedEffect(Unit) {
+        displayRecompositionCount = recompositionRef.count
     }
 
     Column(
@@ -86,7 +90,7 @@ fun ProblemScreen() {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("사용자 타입: $userType")
-                Text("Recomposition 횟수: $recompositionCount")
+                Text("Recomposition 횟수: $displayRecompositionCount")
                 Text("Analytics 업데이트 횟수: ${ExternalAnalytics.updateCount}")
                 Text("Analytics에 저장된 타입: ${ExternalAnalytics.currentUserType}")
             }

@@ -95,12 +95,6 @@ fun SolutionScreen(viewModel: NewsViewModel = viewModel()) {
     // PagingData Flow를 LazyPagingItems로 수집
     val lazyPagingItems = viewModel.newsFlow.collectAsLazyPagingItems()
 
-    var recompositionCount by remember { mutableIntStateOf(0) }
-
-    SideEffect {
-        recompositionCount++
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -152,7 +146,6 @@ fun SolutionScreen(viewModel: NewsViewModel = viewModel()) {
                         Text("로드 상태: ${getLoadStateText(lazyPagingItems.loadState.refresh)}")
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("Recomposition: ${recompositionCount}회")
                         Text("Append: ${getLoadStateText(lazyPagingItems.loadState.append)}")
                     }
                 }

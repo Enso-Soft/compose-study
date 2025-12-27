@@ -71,10 +71,14 @@ fun BasicCounterDemo() {
     // 올바른 상태 관리: remember + mutableStateOf
     var count by remember { mutableIntStateOf(0) }
 
-    // Recomposition 횟수 추적
-    var recompositionCount by remember { mutableIntStateOf(0) }
+    // Recomposition 횟수 추적 (참조 객체 패턴 - 무한 루프 방지)
+    val recompositionRef = remember { object { var count = 0 } }
+    var displayRecompositionCount by remember { mutableIntStateOf(0) }
     SideEffect {
-        recompositionCount++
+        recompositionRef.count++
+    }
+    LaunchedEffect(Unit) {
+        displayRecompositionCount = recompositionRef.count
     }
 
     Column(
@@ -156,7 +160,7 @@ fun BasicCounterDemo() {
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Recomposition 횟수: $recompositionCount",
+                    text = "Recomposition 횟수: $displayRecompositionCount",
                     fontWeight = FontWeight.Bold
                 )
                 Text(

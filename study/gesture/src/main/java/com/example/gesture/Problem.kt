@@ -25,12 +25,6 @@ import androidx.compose.ui.unit.dp
 fun ProblemScreen() {
     var tapCount by remember { mutableIntStateOf(0) }
     var zoomed by remember { mutableStateOf(false) }
-    var recompositionCount by remember { mutableIntStateOf(0) }
-
-    // Recomposition 횟수 추적
-    SideEffect {
-        recompositionCount++
-    }
 
     Column(
         modifier = Modifier
@@ -209,11 +203,5 @@ fun ProblemScreen() {
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Recomposition 횟수: $recompositionCount",
-            style = MaterialTheme.typography.bodySmall
-        )
     }
 }

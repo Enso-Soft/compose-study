@@ -27,12 +27,6 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun ProblemScreen() {
-    var recompositionCount by remember { mutableIntStateOf(0) }
-
-    SideEffect {
-        recompositionCount++
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -130,13 +124,6 @@ Row (1단계)
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Recomposition 횟수: ${recompositionCount}회",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.outline
-        )
     }
 }
 

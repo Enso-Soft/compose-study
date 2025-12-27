@@ -28,13 +28,6 @@ import androidx.compose.ui.viewinterop.AndroidView
  */
 @Composable
 fun SolutionScreen() {
-    var recompositionCount by remember { mutableIntStateOf(0) }
-
-    // Recomposition 횟수 추적
-    SideEffect {
-        recompositionCount++
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +44,7 @@ fun SolutionScreen() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Recomposition 횟수: $recompositionCount",
+            text = "AndroidView 예제",
             style = MaterialTheme.typography.bodyMedium
         )
 
