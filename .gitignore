@@ -24,9 +24,6 @@ local.properties
 
 # Android Studio / IntelliJ
 .idea/
-!.idea/inspectionProfiles/
-!.idea/runConfigurations.xml
-!.idea/misc.xml
 
 # Captures
 /captures
