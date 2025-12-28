@@ -16,10 +16,7 @@
             android:theme="@style/Theme.DeepLink">
 
             <!-- 기본 런처 인텐트 -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            
 
             <!-- Deep Link 인텐트 필터: 커스텀 스킴 -->
             <intent-filter>

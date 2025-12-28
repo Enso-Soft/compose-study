@@ -124,7 +124,7 @@ data class Product(
 }
 
 @Composable
-private fun Practice1ProductList(products: List<Product>) {
+private fun ColumnScope.Practice1ProductList(products: List<Product>) {
     var listRecomposeCount by remember { mutableIntStateOf(0) }
 
     SideEffect {
@@ -305,7 +305,7 @@ Practice2MessageListOptimized(
 }
 
 @Composable
-private fun Practice2MessageList(messages: List<Message>) {
+private fun ColumnScope.Practice2MessageList(messages: List<Message>) {
     var listRecomposeCount by remember { mutableIntStateOf(0) }
 
     SideEffect {

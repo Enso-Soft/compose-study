@@ -6,7 +6,6 @@
 
 | 사전 지식 | 설명 | 바로가기 |
 |----------|------|---------|
-| `Row/Column` | 기본 레이아웃 배치 | [📚 학습하기](../row_column/README.md) |
 | `Modifier` | Composable의 레이아웃과 동작 수정 | [📚 학습하기](../layout_and_modifier/README.md) |
 
 > 선행 학습이 완료되지 않았다면 위 링크를 먼저 학습하세요.
