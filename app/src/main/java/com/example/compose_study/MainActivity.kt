@@ -71,19 +71,21 @@ fun LauncherApp(
     )
     val uiState by viewModel.uiState.collectAsState()
 
-    LauncherScreen(
-        uiState = uiState,
-        onSearchQueryChange = viewModel::onSearchQueryChange,
-        onSearchActiveChange = { active ->
-            if (active) {
-                viewModel.onSearchActivate()
-            } else {
-                viewModel.onSearchDeactivate()
-            }
-        },
-        onRecentSearchClick = viewModel::onRecentSearchClick,
-        onRecentSearchRemove = viewModel::onRecentSearchRemove,
-        onClearRecentSearches = viewModel::onClearRecentSearches,
+        LauncherScreen(
+            uiState = uiState,
+            onSearchQueryChange = viewModel::onSearchQueryChange,
+            onSearchActiveChange = { active ->
+                if (active) {
+                    viewModel.onSearchActivate()
+                } else {
+                    viewModel.onSearchSubmit()
+                    viewModel.onSearchDeactivate()
+                }
+            },
+            onSearchSubmit = viewModel::onSearchSubmit,
+            onRecentSearchClick = viewModel::onRecentSearchClick,
+            onRecentSearchRemove = viewModel::onRecentSearchRemove,
+            onClearRecentSearches = viewModel::onClearRecentSearches,
         onModuleClick = { module ->
             viewModel.onModuleLaunch(module)
             onModuleLaunch(module)

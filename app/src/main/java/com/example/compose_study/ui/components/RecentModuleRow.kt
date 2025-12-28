@@ -1,6 +1,7 @@
 package com.example.compose_study.ui.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,6 +43,7 @@ fun RecentModuleRow(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .animateContentSize()
     ) {
         // 헤더
         Text(

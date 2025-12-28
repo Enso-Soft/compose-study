@@ -3,6 +3,8 @@ package com.example.compose_study.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,6 +65,7 @@ fun LauncherScreen(
     uiState: LauncherUiState,
     onSearchQueryChange: (String) -> Unit,
     onSearchActiveChange: (Boolean) -> Unit,
+    onSearchSubmit: () -> Unit,
     onRecentSearchClick: (String) -> Unit,
     onRecentSearchRemove: (String) -> Unit,
     onClearRecentSearches: () -> Unit,
@@ -117,14 +120,15 @@ fun LauncherScreen(
                     .padding(paddingValues)
             ) {
                 // 검색바 (항상 표시)
-                LauncherSearchBar(
-                    query = uiState.searchQuery,
-                    onQueryChange = onSearchQueryChange,
-                    isActive = uiState.isSearchActive,
-                    onActiveChange = onSearchActiveChange,
-                    searchResults = uiState.filteredModules,
-                    recentSearches = uiState.recentSearches,
-                    recentModules = uiState.recentModules,
+            LauncherSearchBar(
+                query = uiState.searchQuery,
+                onQueryChange = onSearchQueryChange,
+                isActive = uiState.isSearchActive,
+                onActiveChange = onSearchActiveChange,
+                onSearchSubmit = onSearchSubmit,
+                searchResults = uiState.filteredModules,
+                recentSearches = uiState.recentSearches,
+                recentModules = uiState.recentModules,
                     expandedModules = uiState.expandedModules,
                     completedModules = uiState.completedModules,
                     onModuleClick = onModuleClick,
@@ -195,26 +199,18 @@ private fun MainContent(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
-        // 최근 검색어 섹션
-        if (uiState.hasRecentSearches) {
-            item(key = "recent_searches") {
-                RecentSearchList(
-                    searches = uiState.recentSearches,
-                    onSearchClick = onRecentSearchClick,
-                    onSearchRemove = onRecentSearchRemove,
-                    onClearAll = onClearRecentSearches,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-            }
-        }
-
         // 최근 모듈 섹션
-        if (uiState.hasRecentModules) {
-            item(key = "recent_modules") {
+        item(key = "recent_modules") {
+            AnimatedVisibility(
+                visible = uiState.hasRecentModules,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 6 }),
+                exit = fadeOut() + slideOutVertically(targetOffsetY = { -it / 6 })
+            ) {
                 RecentModuleRow(
                     modules = uiState.recentModules,
                     onModuleClick = onModuleClick,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
                 )
             }
         }
@@ -225,7 +221,8 @@ private fun MainContent(
                 text = "학습 모듈",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             )
         }
 

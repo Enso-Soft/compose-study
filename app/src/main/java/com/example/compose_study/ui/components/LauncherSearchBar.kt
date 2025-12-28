@@ -1,5 +1,6 @@
 package com.example.compose_study.ui.components
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,6 +55,7 @@ fun LauncherSearchBar(
     onQueryChange: (String) -> Unit,
     isActive: Boolean,
     onActiveChange: (Boolean) -> Unit,
+    onSearchSubmit: () -> Unit,
     searchResults: List<StudyModule>,
     recentSearches: List<String>,
     recentModules: List<StudyModule>,
@@ -83,7 +85,7 @@ fun LauncherSearchBar(
                 SearchBarDefaults.InputField(
                     query = query,
                     onQueryChange = onQueryChange,
-                    onSearch = { /* 검색 실행 - 이미 실시간 필터링 중 */ },
+                    onSearch = { onSearchSubmit() },
                     expanded = isActive,
                     onExpandedChange = onActiveChange,
                     placeholder = {
@@ -172,31 +174,38 @@ private fun SearchBarContent(
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        if (query.isEmpty()) {
-            // 검색어가 비어있을 때: 최근 검색어 + 최근 모듈
-            RecentSearchList(
-                searches = recentSearches,
-                onSearchClick = onRecentSearchClick,
-                onSearchRemove = onRecentSearchRemove,
-                onClearAll = onClearRecentSearches
-            )
+        Crossfade(
+            targetState = query.isEmpty(),
+            label = "search_content"
+        ) { showRecent ->
+            if (showRecent) {
+                // 검색어가 비어있을 때: 최근 검색어 + 최근 모듈
+                Column {
+                    RecentSearchList(
+                        searches = recentSearches,
+                        onSearchClick = onRecentSearchClick,
+                        onSearchRemove = onRecentSearchRemove,
+                        onClearAll = onClearRecentSearches
+                    )
 
-            RecentModuleRow(
-                modules = recentModules,
-                onModuleClick = onModuleClick
-            )
-        } else {
-            // 검색어가 있을 때: 검색 결과
-            SearchResultList(
-                modules = searchResults,
-                query = query,
-                expandedModules = expandedModules,
-                completedModules = completedModules,
-                onModuleToggle = onModuleToggle,
-                onModuleLaunch = onModuleClick,
-                onModuleCompleteToggle = onModuleCompleteToggle,
-                getPrerequisites = getPrerequisites
-            )
+                    RecentModuleRow(
+                        modules = recentModules,
+                        onModuleClick = onModuleClick
+                    )
+                }
+            } else {
+                // 검색어가 있을 때: 검색 결과
+                SearchResultList(
+                    modules = searchResults,
+                    query = query,
+                    expandedModules = expandedModules,
+                    completedModules = completedModules,
+                    onModuleToggle = onModuleToggle,
+                    onModuleLaunch = onModuleClick,
+                    onModuleCompleteToggle = onModuleCompleteToggle,
+                    getPrerequisites = getPrerequisites
+                )
+            }
         }
     }
 }
