@@ -3,6 +3,7 @@ package com.example.compose_study.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -72,82 +74,98 @@ fun LauncherScreen(
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            // 검색바가 활성화되지 않았을 때만 TopAppBar 표시
-            AnimatedVisibility(
-                visible = !uiState.isSearchActive,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Compose Study",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    },
-                    scrollBehavior = scrollBehavior
-                )
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            containerColor = Color.Transparent,
+            topBar = {
+                // 검색바가 활성화되지 않았을 때만 TopAppBar 표시
+                AnimatedVisibility(
+                    visible = !uiState.isSearchActive,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    TopAppBar(
+                        title = {
+                            Column {
+                                Text(
+                                    text = "Compose Study",
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
+                                Text(
+                                    text = "모듈을 탐색하고 학습을 시작하세요",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent
+                        ),
+                        scrollBehavior = scrollBehavior
+                    )
+                }
             }
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // 검색바 (항상 표시)
-            LauncherSearchBar(
-                query = uiState.searchQuery,
-                onQueryChange = onSearchQueryChange,
-                isActive = uiState.isSearchActive,
-                onActiveChange = onSearchActiveChange,
-                searchResults = uiState.filteredModules,
-                recentSearches = uiState.recentSearches,
-                recentModules = uiState.recentModules,
-                expandedModules = uiState.expandedModules,
-                completedModules = uiState.completedModules,
-                onModuleClick = onModuleClick,
-                onModuleToggle = onModuleToggle,
-                onModuleCompleteToggle = onModuleCompleteToggle,
-                onRecentSearchClick = onRecentSearchClick,
-                onRecentSearchRemove = onRecentSearchRemove,
-                onClearRecentSearches = onClearRecentSearches,
-                getPrerequisites = getPrerequisites,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-
-            // 검색바가 비활성화 상태일 때만 메인 콘텐츠 표시
-            AnimatedVisibility(
-                visible = !uiState.isSearchActive,
-                enter = fadeIn(),
-                exit = fadeOut()
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
-                when {
-                    uiState.isLoading -> {
-                        LoadingContent()
-                    }
-                    uiState.hasError -> {
-                        ErrorContent(message = uiState.error ?: "알 수 없는 오류")
-                    }
-                    uiState.allLevels.isEmpty() -> {
-                        EmptyContent()
-                    }
-                    else -> {
-                        MainContent(
-                            uiState = uiState,
-                            onRecentSearchClick = onRecentSearchClick,
-                            onRecentSearchRemove = onRecentSearchRemove,
-                            onClearRecentSearches = onClearRecentSearches,
-                            onModuleClick = onModuleClick,
-                            onModuleToggle = onModuleToggle,
-                            onModuleCompleteToggle = onModuleCompleteToggle,
-                            onLevelToggle = onLevelToggle,
-                            getPrerequisites = getPrerequisites
-                        )
+                // 검색바 (항상 표시)
+                LauncherSearchBar(
+                    query = uiState.searchQuery,
+                    onQueryChange = onSearchQueryChange,
+                    isActive = uiState.isSearchActive,
+                    onActiveChange = onSearchActiveChange,
+                    searchResults = uiState.filteredModules,
+                    recentSearches = uiState.recentSearches,
+                    recentModules = uiState.recentModules,
+                    expandedModules = uiState.expandedModules,
+                    completedModules = uiState.completedModules,
+                    onModuleClick = onModuleClick,
+                    onModuleToggle = onModuleToggle,
+                    onModuleCompleteToggle = onModuleCompleteToggle,
+                    onRecentSearchClick = onRecentSearchClick,
+                    onRecentSearchRemove = onRecentSearchRemove,
+                    onClearRecentSearches = onClearRecentSearches,
+                    getPrerequisites = getPrerequisites,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+
+                // 검색바가 비활성화 상태일 때만 메인 콘텐츠 표시
+                AnimatedVisibility(
+                    visible = !uiState.isSearchActive,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    when {
+                        uiState.isLoading -> {
+                            LoadingContent()
+                        }
+                        uiState.hasError -> {
+                            ErrorContent(message = uiState.error ?: "알 수 없는 오류")
+                        }
+                        uiState.allLevels.isEmpty() -> {
+                            EmptyContent()
+                        }
+                        else -> {
+                            MainContent(
+                                uiState = uiState,
+                                onRecentSearchClick = onRecentSearchClick,
+                                onRecentSearchRemove = onRecentSearchRemove,
+                                onClearRecentSearches = onClearRecentSearches,
+                                onModuleClick = onModuleClick,
+                                onModuleToggle = onModuleToggle,
+                                onModuleCompleteToggle = onModuleCompleteToggle,
+                                onLevelToggle = onLevelToggle,
+                                getPrerequisites = getPrerequisites
+                            )
+                        }
                     }
                 }
             }
@@ -205,8 +223,8 @@ private fun MainContent(
         item(key = "levels_header") {
             Text(
                 text = "학습 모듈",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
         }

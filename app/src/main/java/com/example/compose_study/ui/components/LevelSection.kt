@@ -7,10 +7,8 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.compose_study.model.Level
 import com.example.compose_study.model.StudyModule
@@ -78,7 +75,8 @@ fun LevelSection(
             completedCount = completedCount,
             isExpanded = isExpanded,
             arrowRotation = arrowRotation,
-            onClick = onToggle
+            onClick = onToggle,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
         )
 
         // 모듈 목록 (AnimatedVisibility)
@@ -139,17 +137,23 @@ private fun LevelHeader(
     val progressText = "$completedCount/$totalCount"
     Surface(
         modifier = modifier.fillMaxWidth(),
+        onClick = onClick,
         color = if (isExpanded) {
             MaterialTheme.colorScheme.primaryContainer
         } else {
             MaterialTheme.colorScheme.surface
         },
-        tonalElevation = if (isExpanded) 2.dp else 0.dp
+        shape = MaterialTheme.shapes.large,
+        tonalElevation = 0.dp,
+        shadowElevation = if (isExpanded) 4.dp else 1.dp,
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+        )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically

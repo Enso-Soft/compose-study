@@ -45,8 +45,8 @@ fun RecentModuleRow(
     ) {
         // 헤더
         Text(
-            text = "📖 최근 학습",
-            style = MaterialTheme.typography.titleSmall,
+            text = "최근 학습",
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
@@ -80,13 +80,19 @@ private fun RecentModuleCard(
 ) {
     Card(
         modifier = modifier
-            .width(140.dp)
+            .width(160.dp)
             .semantics {
                 contentDescription = "${module.name} 모듈, ${module.category.displayName} 카테고리. 클릭하여 학습 시작"
             }
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        shape = MaterialTheme.shapes.large,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
         )
     ) {
         Column(
@@ -95,7 +101,7 @@ private fun RecentModuleCard(
             // 카테고리 이모지
             Text(
                 text = module.category.emoji,
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineMedium
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -104,7 +110,7 @@ private fun RecentModuleCard(
             Text(
                 text = module.name,
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -113,7 +119,7 @@ private fun RecentModuleCard(
             Text(
                 text = module.category.displayName,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

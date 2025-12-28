@@ -62,7 +62,7 @@ fun SearchResultList(
             // 검색 결과 개수 헤더
             Text(
                 text = "검색 결과 ${modules.size}개",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
