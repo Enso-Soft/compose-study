@@ -22,20 +22,11 @@ build/
 # Local configuration file
 local.properties
 
-# Android Studio
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-/.idea/deploymentTargetSelector.xml
-/.idea/other.xml
-/.idea/gradle.xml
-/.idea/kotlinc.xml
-/.idea/appInsightsSettings.xml
-/.idea/migrations.xml
-/.idea/vcs.xml
+# Android Studio / IntelliJ
+.idea/
+!.idea/inspectionProfiles/
+!.idea/runConfigurations.xml
+!.idea/misc.xml
 
 # Captures
 /captures
