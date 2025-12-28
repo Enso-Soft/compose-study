@@ -17,19 +17,42 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 모듈 네이밍 규칙
 
-- **위치**: `study/{module_name}/` 디렉토리 하위
+- **위치**: `study/{category}/{module_name}/` 디렉토리 하위
 - **모듈명**: **snake_case** 사용 (예: `launched_effect`, `disposable_effect`)
 - **패키지명**: snake_case 그대로 사용 (`com.example.launched_effect`)
 
 ```
 # 올바른 예시
-study/launched_effect/
-study/disposable_effect/
-study/remember_coroutine_scope/
+study/effect/launched_effect/
+study/effect/disposable_effect/
+study/component/action/button/
 
 # 잘못된 예시
-launchedeffect/          # ❌ study/ 없음, snake_case 아님
-study/launchedEffect/    # ❌ camelCase
+study/launched_effect/     # ❌ 카테고리 없음
+study/launchedEffect/      # ❌ camelCase
+```
+
+### 카테고리 구조
+```
+study/
+├── basics/          # Kotlin, Compose 입문
+├── layout/          # 레이아웃 & Modifier
+├── state/           # 상태 관리
+├── component/       # UI 컴포넌트
+│   ├── action/      # 버튼, 메뉴
+│   ├── selection/   # 체크박스, 라디오, 스위치 등
+│   ├── input/       # 텍스트필드, 슬라이더, 날짜/시간 선택
+│   └── display/     # 카드, 다이얼로그, 배지 등
+├── list/            # 리스트 & 스크롤
+├── structure/       # 앱 구조 (Scaffold 등)
+├── effect/          # Side Effects
+├── navigation/      # 네비게이션
+├── animation/       # 애니메이션
+├── architecture/    # 아키텍처 패턴
+├── interaction/     # 제스처 & 인터랙션
+├── integration/     # 외부 통합
+├── system/          # 시스템 기능
+└── testing/         # 테스트 & 성능
 ```
 
 ## MCP Policy
@@ -81,8 +104,9 @@ study/launchedEffect/    # ❌ camelCase
 ./gradlew build
 
 # 특정 모듈만 빌드/실행 (각 기술별)
-./gradlew :study:launched_effect:installDebug
-./gradlew :study:disposable_effect:installDebug
+./gradlew :study:effect:launched_effect:installDebug
+./gradlew :study:effect:disposable_effect:installDebug
+./gradlew :study:component:action:button:installDebug
 
 # 메인 앱 설치 및 실행
 ./gradlew :app:installDebug
@@ -92,7 +116,7 @@ study/launchedEffect/    # ❌ camelCase
 ./gradlew connectedAndroidTest    # Instrumented tests
 
 # 특정 모듈 테스트
-./gradlew :study:launched_effect:test
+./gradlew :study:effect:launched_effect:test
 
 # 린트
 ./gradlew lint
@@ -104,19 +128,27 @@ study/launchedEffect/    # ❌ camelCase
 composestudy/
 ├── app/                              # 메인 앱
 ├── study/                            # 학습 모듈 디렉토리
-│   ├── launched_effect/              # LaunchedEffect 학습 모듈
-│   ├── disposable_effect/            # DisposableEffect 학습 모듈
-│   ├── remember_coroutine_scope/     # (예정)
-│   └── {module_name}/                # 각 기술별 독립 모듈
+│   ├── basics/                       # Kotlin, Compose 입문
+│   ├── effect/                       # Side Effects
+│   │   ├── launched_effect/          # LaunchedEffect 학습 모듈
+│   │   ├── disposable_effect/        # DisposableEffect 학습 모듈
+│   │   └── ...
+│   ├── component/                    # UI 컴포넌트
+│   │   ├── action/                   # 버튼, 메뉴
+│   │   │   └── button/
+│   │   ├── selection/                # 체크박스, 라디오 등
+│   │   └── ...
+│   └── {category}/{module_name}/     # 각 기술별 독립 모듈
+│       ├── README.md                 # 학습 개념 문서 (모듈 루트)
 │       ├── build.gradle.kts
 │       └── src/main/java/.../
 │           ├── MainActivity.kt       # 탭 네비게이션 (Problem/Solution/Practice)
-│           ├── README.md             # 학습 개념 문서
 │           ├── Problem.kt            # 문제 상황 코드
 │           ├── Solution.kt           # 해결책 코드
 │           └── Practice.kt           # 연습용 코드
-└── .claude/skills/                   # Claude Skills
-    └── compose-module/               # 모듈 생성 자동화 스킬
+└── .claude/                          # Claude 설정
+    ├── agents/                       # Claude Agents
+    └── skills/                       # Claude Skills
 ```
 
 ## 완성된 학습 자료

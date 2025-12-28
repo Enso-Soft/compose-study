@@ -1,622 +1,482 @@
-# Android Jetpack Compose 학습 로드맵
+# Jetpack Compose 학습 바이블
 
-> 이 문서는 2024-2025년 공식 자료와 커뮤니티 베스트 프랙티스를 기반으로 작성되었습니다.
-
----
-
-## 📊 학습 진행 현황
-
-```
-완료된 모듈: 37개 | 전체 커버리지: 약 100%
-```
-
-| 영역 | 상태 | 설명 |
-|------|------|------|
-| Kotlin 기초 | ✅ 완료 | 람다, 확장 함수, 후행 람다, 널 안전성 |
-| Compose 기초 | ✅ 완료 | Composable 함수, UI 컴포넌트, Layout, Modifier |
-| 상태 관리 | ✅ 완료 | remember, rememberSaveable, State Hoisting, ViewModel |
-| Side Effects | ✅ 완료 | LaunchedEffect, DisposableEffect, SideEffect, produceState 등 6개 |
-| 성능 최적화 | ✅ 완료 | Recomposition, Stability, derivedStateOf |
-| Navigation | ✅ 완료 | Type-Safe Navigation |
-| Lifecycle | ✅ 완료 | LifecycleStartEffect, LifecycleResumeEffect |
-| **애니메이션** | ✅ 완료 | animate*AsState, AnimatedVisibility, Crossfade |
-| **Scaffold/테마** | ✅ 완료 | MaterialTheme, Scaffold, TopAppBar, 다크모드 |
-| **UI 테스트** | ✅ 완료 | ComposeTestRule, 시맨틱 |
-| **Preview** | ✅ 완료 | @Preview 어노테이션 활용 |
-| **상호운용성** | ✅ 완료 | AndroidView, ComposeView |
+> 처음부터 끝까지, 순서대로 배우는 Jetpack Compose
 
 ---
 
-## 왜 학습 순서가 중요한가?
+## 학습 로드맵
 
-Compose의 개념들은 **서로 의존 관계**가 있습니다:
+### Level 0: 사전 준비
 
-```
-State를 모르면 → Side Effects를 이해할 수 없음
-Side Effects를 모르면 → Navigation에서 데이터 로드를 구현할 수 없음
-Recomposition을 모르면 → 성능 최적화를 할 수 없음
-```
-
-잘못된 순서로 학습하면 **"왜 이게 필요한지"를 이해하지 못한 채** 문법만 외우게 됩니다.
-
----
-
-## 학습 로드맵 개요
-
-```
-Level 1: 기초 ✅       ──→ Level 2: 상태 관리 ✅   ──→ Level 3: Side Effects ✅
-(1-2주)                    (2-3주, 가장 중요)           (2주)
-    │                           │                          │
-    ▼                           ▼                          ▼
-Kotlin 기초               remember/mutableStateOf      LaunchedEffect
-Composable 함수           rememberSaveable             rememberCoroutineScope
-기본 UI 컴포넌트           State Hoisting              DisposableEffect
-Layout & Modifier         ViewModel 통합               SideEffect
-
-                              │
-         ┌────────────────────┴────────────────────┐
-         ▼                                         ▼
-Level 4: 성능 최적화 ✅                     Level 5: 고급 주제 ⚠️
-(1-2주)                                     (2-3주)
-    │                                           │
-    ▼                                           ▼
-Recomposition 이해                          Navigation ✅
-Stability                                   Lifecycle 통합 ✅
-derivedStateOf                              Animation ❌ (미완성)
-
-         ┌────────────────────────────────────────┐
-         ▼
-Level 6: 추가 주제 ❌ (향후 추가 예정)
-    │
-    ▼
-Scaffold & Theme
-UI Testing
-Preview 활용
-View-Compose 상호운용
-```
-
----
-
-## Level 1: 기초 (1-2주)
-
-### 1.1 Kotlin 기초 (선행 필수)
-
-Compose는 **Kotlin DSL**로 구성됩니다. 아래 개념이 없으면 Compose 코드를 읽을 수 없습니다:
-
-| 개념 | Compose에서의 활용 |
-|------|-------------------|
-| 람다 표현식 | `Button(onClick = { })` 모든 이벤트 핸들러 |
-| 확장 함수 | `Modifier.padding().background()` 체이닝 |
-| 후행 람다 | `Column { Text("Hello") }` 모든 컨테이너 |
-| 널 안전성 | `text?.let { }` 조건부 렌더링 |
-
-### 1.2 Composable 함수
-
-```kotlin
-@Composable
-fun Greeting(name: String) {  // 선언적 UI의 기본 단위
-    Text("Hello, $name")
-}
-```
-
-**왜 먼저 배우나?** 모든 Compose UI는 `@Composable` 함수입니다. 이것 없이는 아무것도 못 합니다.
-
-### 1.3 기본 UI 컴포넌트
-
-- `Text`, `Button`, `Image`, `Icon`, `TextField`
-- 가장 자주 사용하는 빌딩 블록
-- 이후 모든 학습에서 실습 재료로 사용
-
-### 1.4 Layout & Modifier
-
-```kotlin
-Column(
-    modifier = Modifier
-        .padding(16.dp)
-        .fillMaxWidth()
-) {
-    Row { /* 가로 배치 */ }
-    Box { /* 겹치기 */ }
-}
-```
-
-**왜 먼저 배우나?** UI 구성의 근본입니다. 모든 화면은 Column, Row, Box의 조합입니다.
-
----
-
-## Level 2: 상태 관리 (2-3주)
-
-> **이 단계가 가장 중요합니다.** Compose의 핵심은 "상태가 변하면 UI가 자동으로 업데이트된다"입니다.
-
-### 2.1 remember & mutableStateOf
-
-```kotlin
-@Composable
-fun Counter() {
-    var count by remember { mutableStateOf(0) }  // 상태 선언
-    Button(onClick = { count++ }) {              // 상태 변경
-        Text("Count: $count")                    // 상태 사용 → 자동 업데이트
-    }
-}
-```
-
-**왜 먼저 배우나?**
-- 모든 상태 관리의 기초
-- `remember` 없이는 상태가 매 Recomposition마다 초기화됨
-- Side Effects 이해의 전제조건
-
-### 2.2 rememberSaveable
-
-```kotlin
-var text by rememberSaveable { mutableStateOf("") }  // 화면 회전 후에도 유지
-```
-
-**왜 두 번째로 배우나?**
-- `remember`만으로는 화면 회전 시 상태가 사라지는 **실제 문제** 발생
-- Configuration Change 대응 방법 이해
-
-### 2.3 State Hoisting (상태 끌어올리기)
-
-```kotlin
-// Stateless Composable - 재사용 가능
-@Composable
-fun Counter(
-    count: Int,           // 상태는 외부에서 받음
-    onIncrement: () -> Unit
-) {
-    Button(onClick = onIncrement) {
-        Text("Count: $count")
-    }
-}
-
-// 상위 Composable에서 상태 관리
-@Composable
-fun CounterScreen() {
-    var count by remember { mutableStateOf(0) }
-    Counter(count = count, onIncrement = { count++ })
-}
-```
-
-**왜 세 번째로 배우나?**
-- **재사용 가능한 컴포넌트** 설계의 핵심
-- Unidirectional Data Flow(UDF) 패턴: **상태는 아래로, 이벤트는 위로**
-- 테스트 용이성 향상
-
-### 2.4 ViewModel 통합
-
-```kotlin
-class CounterViewModel : ViewModel() {
-    private val _count = MutableStateFlow(0)
-    val count: StateFlow<Int> = _count.asStateFlow()
-
-    fun increment() { _count.value++ }
-}
-
-@Composable
-fun CounterScreen(viewModel: CounterViewModel = viewModel()) {
-    val count by viewModel.count.collectAsState()
-    Counter(count = count, onIncrement = viewModel::increment)
-}
-```
-
-**왜 네 번째로 배우나?**
-- **화면 수준**의 상태 관리
-- 비즈니스 로직과 UI 분리
-- 프로덕션 앱의 표준 아키텍처 (MVVM)
-
----
-
-## Level 3: Side Effects (2주)
-
-> Side Effect = "Composable 함수 범위 밖에서 발생하는 상태 변경"
-
-### Side Effects 실행 순서 (공식 문서 기반)
-
-```
-Composition 시작
-    ↓
-Composable 함수 실행
-    ↓
-DisposableEffect 등록
-    ↓
-LaunchedEffect 등록
-    ↓
-Composition 종료
-    ↓
-DisposableEffect 실행 (동기)
-    ↓
-LaunchedEffect 코루틴 시작 (비동기)
-```
-
-### 3.1 LaunchedEffect (가장 먼저)
-
-```kotlin
-@Composable
-fun UserProfile(userId: String) {
-    var user by remember { mutableStateOf<User?>(null) }
-
-    LaunchedEffect(userId) {  // userId가 바뀌면 재실행
-        user = api.fetchUser(userId)  // suspend 함수 호출 가능
-    }
-
-    user?.let { Text(it.name) }
-}
-```
-
-**왜 먼저 배우나?**
-- **가장 흔히 사용**됨 (API 호출, 애니메이션, 타이머)
-- Composable 진입 시점 또는 key 변경 시 실행
-- 자동으로 취소됨 (메모리 누수 방지)
-
-### 3.2 rememberCoroutineScope
-
-```kotlin
-@Composable
-fun SendButton() {
-    val scope = rememberCoroutineScope()
-
-    Button(onClick = {
-        scope.launch {  // 이벤트 핸들러 내에서 코루틴 실행
-            api.sendMessage()
-        }
-    }) {
-        Text("Send")
-    }
-}
-```
-
-**왜 두 번째로 배우나?**
-- `LaunchedEffect`는 **자동 실행**용
-- `rememberCoroutineScope`는 **사용자 이벤트** 기반 실행용
-- 버튼 클릭 등 이벤트 핸들러에서는 `LaunchedEffect` 사용 불가
-
-### 3.3 DisposableEffect
-
-```kotlin
-@Composable
-fun LocationTracker() {
-    val context = LocalContext.current
-
-    DisposableEffect(Unit) {
-        val listener = LocationListener { /* 위치 업데이트 */ }
-        locationManager.registerListener(listener)  // 등록
-
-        onDispose {
-            locationManager.unregisterListener(listener)  // 정리!
-        }
-    }
-}
-```
-
-**왜 세 번째로 배우나?**
-- **리소스 정리**가 필요한 경우
-- 리스너 등록/해제, 시스템 콜백 관리
-- `onDispose` 콜백이 핵심
-
-### 3.4 SideEffect
-
-```kotlin
-@Composable
-fun AnalyticsScreen(screenName: String) {
-    SideEffect {
-        analytics.logScreenView(screenName)  // 매 성공적인 Recomposition 후 실행
-    }
-}
-```
-
-**왜 네 번째로 배우나?**
-- 상대적으로 **드물게 사용**
-- Compose 상태를 **외부 시스템과 동기화**할 때
-- 코루틴이 필요 없는 동기 작업용
-
----
-
-## Level 4: 성능 최적화 (1-2주)
-
-### 4.1 Recomposition 이해
-
-```kotlin
-@Composable
-fun Parent() {
-    var count by remember { mutableStateOf(0) }
-
-    Column {
-        Text("Count: $count")      // count 변경 시 recompose
-        ExpensiveChild()           // Compose가 "스마트하게" 스킵 가능
-    }
-}
-```
-
-**왜 먼저 배우나?** 성능 최적화의 **전제 지식**입니다.
-
-### 4.2 Stability (안정성)
-
-| 타입 | 안정성 | 이유 |
-|------|--------|------|
-| `Int`, `String`, `Boolean` | Stable | 불변 원시 타입 |
-| `data class`(val만) | Stable | 불변으로 추론 가능 |
-| `List`, `Map`, `Set` | **Unstable** | 불변 보장 불가 |
-| 외부 라이브러리 클래스 | **Unstable** | Compose가 판단 불가 |
-
-```kotlin
-// Unstable → 매번 Recomposition
-@Composable
-fun UserList(users: List<User>) { ... }
-
-// Stable로 만들기
-@Immutable
-data class User(val id: String, val name: String)
-
-// 또는 Kotlinx Immutable Collections 사용
-fun UserList(users: ImmutableList<User>) { ... }
-```
-
-### 4.3 derivedStateOf
-
-```kotlin
-@Composable
-fun SearchResults(items: List<Item>, query: String) {
-    // query가 바뀔 때마다 필터링 → 매우 자주 발생 가능
-    val filtered by remember(items, query) {
-        derivedStateOf {  // 결과가 실제로 바뀔 때만 Recomposition
-            items.filter { it.name.contains(query) }
-        }
-    }
-}
-```
-
----
-
-## Level 5: 고급 주제 (2-3주)
-
-### 5.1 Navigation
-
-```kotlin
-// Type-Safe Navigation (권장)
-@Serializable
-object Home
-
-@Serializable
-data class Profile(val userId: String)
-
-@Composable
-fun AppNavigation() {
-    val navController = rememberNavController()
-
-    NavHost(navController, startDestination = Home) {
-        composable<Home> { HomeScreen(navController) }
-        composable<Profile> { backStackEntry ->
-            val profile: Profile = backStackEntry.toRoute()
-            ProfileScreen(profile.userId)
-        }
-    }
-}
-```
-
-**2024-2025 권장사항:**
-- Type-Safe Navigation 사용 (`@Serializable` 객체로 Route 정의)
-- 하드코딩 문자열 Route 대신 sealed class 사용
-
-### 5.2 Lifecycle 통합
-
-```kotlin
-@Composable
-fun CameraPreview() {
-    LifecycleStartEffect(Unit) {
-        camera.start()  // ON_START에서 실행
-
-        onStopOrDispose {
-            camera.stop()  // ON_STOP 또는 Composable 제거 시
-        }
-    }
-}
-```
-
----
-
-## 📚 완성된 학습 모듈
-
-### Level 1: 기초
-
-| 모듈 | 주제 | 실행 명령어 |
-|------|------|------------|
-| 📁 [kotlin_basics](study/kotlin_basics/src/main/java/com/example/kotlin_basics/README.md) | Kotlin 기초 (람다, 확장함수, 널안전성) | `./gradlew :study:kotlin_basics:installDebug` |
-| 📁 [compose_introduction](study/compose_introduction/src/main/java/com/example/compose_introduction/README.md) | Compose 소개, 선언적 UI vs 명령형 UI | `./gradlew :study:compose_introduction:installDebug` |
-| 📁 [composable_function](study/composable_function/src/main/java/com/example/composable_function/README.md) | @Composable 함수, Recomposition | `./gradlew :study:composable_function:installDebug` |
-| 📁 [basic_ui_components](study/basic_ui_components/src/main/java/com/example/basic_ui_components/README.md) | Text, Button, TextField, Icon | `./gradlew :study:basic_ui_components:installDebug` |
-| 📁 [layout_and_modifier](study/layout_and_modifier/src/main/java/com/example/layout_and_modifier/README.md) | Column, Row, Box, Modifier | `./gradlew :study:layout_and_modifier:installDebug` |
-| 📁 [screen_and_component](study/screen_and_component/src/main/java/com/example/screen_and_component/README.md) | Screen vs Component, Stateful/Stateless 분리, 화면 구조 | `./gradlew :study:screen_and_component:installDebug` |
-
-### Level 2: 상태 관리
-
-| 모듈 | 주제 | 실행 명령어 |
-|------|------|------------|
-| 📁 [remember](study/remember/src/main/java/com/example/remember/README.md) | remember, mutableStateOf | `./gradlew :study:remember:installDebug` |
-| 📁 [remember_saveable](study/remember_saveable/src/main/java/com/example/remember_saveable/README.md) | rememberSaveable, Saver, Parcelize | `./gradlew :study:remember_saveable:installDebug` |
-| 📁 [state_hoisting](study/state_hoisting/src/main/java/com/example/state_hoisting/README.md) | State Hoisting (상태 끌어올리기) | `./gradlew :study:state_hoisting:installDebug` |
-| 📁 [view_model](study/view_model/src/main/java/com/example/view_model/README.md) | ViewModel + Compose 통합 | `./gradlew :study:view_model:installDebug` |
-| 📁 [state_restoration_advanced](study/state_restoration_advanced/src/main/java/com/example/state_restoration_advanced/README.md) | 커스텀 Saver, SavedStateHandle, 프로세스 종료 복원 | `./gradlew :study:state_restoration_advanced:installDebug` |
-| 📁 [state_management_advanced](study/state_management_advanced/src/main/java/com/example/state_management_advanced/README.md) | StateFlow vs SharedFlow vs Channel, collectAsStateWithLifecycle, WhileSubscribed, MVI 패턴 | `./gradlew :study:state_management_advanced:installDebug` |
-
-### Level 3: Side Effects
-
-| 모듈 | 주제 | 실행 명령어 |
-|------|------|------------|
-| 📁 [launched_effect](study/launched_effect/src/main/java/com/example/launched_effect/README.md) | LaunchedEffect | `./gradlew :study:launched_effect:installDebug` |
-| 📁 [remember_coroutine_scope](study/remember_coroutine_scope/src/main/java/com/example/remember_coroutine_scope/README.md) | rememberCoroutineScope | `./gradlew :study:remember_coroutine_scope:installDebug` |
-| 📁 [disposable_effect](study/disposable_effect/src/main/java/com/example/disposable_effect/README.md) | DisposableEffect | `./gradlew :study:disposable_effect:installDebug` |
-| 📁 [side_effect](study/side_effect/src/main/java/com/example/side_effect/README.md) | SideEffect | `./gradlew :study:side_effect:installDebug` |
-| 📁 [derived_state_of](study/derived_state_of/src/main/java/com/example/derived_state_of/README.md) | derivedStateOf | `./gradlew :study:derived_state_of:installDebug` |
-| 📁 [produce_state](study/produce_state/src/main/java/com/example/produce_state/README.md) | produceState | `./gradlew :study:produce_state:installDebug` |
-| 📁 [effect_handlers_advanced](study/effect_handlers_advanced/src/main/java/com/example/effect_handlers_advanced/README.md) | snapshotFlow, rememberUpdatedState, currentRecomposeScope, derivedStateOf vs snapshotFlow | `./gradlew :study:effect_handlers_advanced:installDebug` |
-
-### Level 4: 성능 최적화
-
-| 모듈 | 주제 | 실행 명령어 |
-|------|------|------------|
-| 📁 [recomposition](study/recomposition/src/main/java/com/example/recomposition/README.md) | Recomposition 이해 | `./gradlew :study:recomposition:installDebug` |
-| 📁 [stability](study/stability/src/main/java/com/example/stability/README.md) | Stability (@Stable, @Immutable) | `./gradlew :study:stability:installDebug` |
-| 📁 [compose_compiler_metrics](study/compose_compiler_metrics/src/main/java/com/example/compose_compiler_metrics/README.md) | Compiler Metrics & Reports, Strong Skipping Mode | `./gradlew :study:compose_compiler_metrics:installDebug` |
-| 📁 [baseline_profiles](study/baseline_profiles/src/main/java/com/example/baseline_profiles/README.md) | Baseline Profiles, Startup Profiles, AOT 컴파일, Macrobenchmark | `./gradlew :study:baseline_profiles:installDebug` |
-
-### Level 5: 고급 주제
-
-| 모듈 | 주제 | 실행 명령어 |
-|------|------|------------|
-| 📁 [navigation](study/navigation/src/main/java/com/example/navigation/README.md) | Navigation Compose (Type-Safe) | `./gradlew :study:navigation:installDebug` |
-| 📁 [navigation_3](study/navigation_3/src/main/java/com/example/navigation_3/README.md) | Navigation 3 (Nav3) - 2025 최신 네비게이션 | `./gradlew :study:navigation_3:installDebug` |
-| 📁 [lifecycle_integration](study/lifecycle_integration/src/main/java/com/example/lifecycle_integration/README.md) | Lifecycle Integration | `./gradlew :study:lifecycle_integration:installDebug` |
-| 📁 [preview](study/preview/src/main/java/com/example/preview/README.md) | @Preview, @PreviewParameter, Multipreview | `./gradlew :study:preview:installDebug` |
-| 📁 [animation_basics](study/animation_basics/src/main/java/com/example/animation_basics/README.md) | animate*AsState, AnimatedVisibility, Crossfade | `./gradlew :study:animation_basics:installDebug` |
-| 📁 [animation_advanced](study/animation_advanced/src/main/java/com/example/animation_advanced/README.md) | updateTransition, Animatable, AnimationSpec | `./gradlew :study:animation_advanced:installDebug` |
-| 📁 [shared_element_transition](study/shared_element_transition/src/main/java/com/example/shared_element_transition/README.md) | SharedTransitionLayout, sharedElement, sharedBounds | `./gradlew :study:shared_element_transition:installDebug` |
-| 📁 [animate_bounds](study/animate_bounds/src/main/java/com/example/animate_bounds/README.md) | LookaheadScope, animateBounds, BoundsTransform | `./gradlew :study:animate_bounds:installDebug` |
-| 📁 [scaffold_and_theming](study/scaffold_and_theming/src/main/java/com/example/scaffold_and_theming/README.md) | MaterialTheme, Scaffold, TopAppBar, 다크모드 | `./gradlew :study:scaffold_and_theming:installDebug` |
-| 📁 [compose_testing](study/compose_testing/src/main/java/com/example/compose_testing/README.md) | ComposeTestRule, Semantics, UI 테스트 | `./gradlew :study:compose_testing:installDebug` |
-| 📁 [screenshot_testing](study/screenshot_testing/src/main/java/com/example/screenshot_testing/README.md) | Paparazzi, Roborazzi, 스냅샷 테스트 | `./gradlew :study:screenshot_testing:installDebug` |
-| 📁 [interoperability](study/interoperability/src/main/java/com/example/interoperability/README.md) | AndroidView, ComposeView, 상호운용성 | `./gradlew :study:interoperability:installDebug` |
-| 📁 [deep_link](study/deep_link/src/main/java/com/example/deep_link/README.md) | Deep Link, navDeepLink, URI 처리 | `./gradlew :study:deep_link:installDebug` |
-| 📁 [back_handler](study/back_handler/src/main/java/com/example/back_handler/README.md) | BackHandler, 뒤로가기 처리, Predictive Back | `./gradlew :study:back_handler:installDebug` |
-
-### Level 6: 확장 기능
-
-| 모듈 | 주제 | 실행 명령어 |
-|------|------|------------|
-| 📁 [custom_layout](study/custom_layout/src/main/java/com/example/custom_layout/README.md) | Layout composable, MeasurePolicy, SubcomposeLayout | `./gradlew :study:custom_layout:installDebug` |
-| 📁 [constraint_layout](study/constraint_layout/src/main/java/com/example/constraint_layout/README.md) | ConstraintLayout, Barrier, Chain, Guideline | `./gradlew :study:constraint_layout:installDebug` |
-| 📁 [hilt_viewmodel](study/hilt_viewmodel/src/main/java/com/example/hilt_viewmodel/README.md) | @HiltViewModel, SavedStateHandle, hiltViewModel() | `./gradlew :study:hilt_viewmodel:installDebug` |
-| 📁 [lazy_layouts](study/lazy_layouts/src/main/java/com/example/lazy_layouts/README.md) | LazyColumn/Row/Grid, key, contentType, derivedStateOf | `./gradlew :study:lazy_layouts:installDebug` |
-| 📁 [composition_local](study/composition_local/src/main/java/com/example/composition_local/README.md) | CompositionLocal, compositionLocalOf, Provider | `./gradlew :study:composition_local:installDebug` |
-| 📁 [window_insets](study/window_insets/src/main/java/com/example/window_insets/README.md) | WindowInsets, Edge-to-Edge, imePadding | `./gradlew :study:window_insets:installDebug` |
-| 📁 [gesture](study/gesture/src/main/java/com/example/gesture/README.md) | pointerInput, detectTapGestures, detectDragGestures | `./gradlew :study:gesture:installDebug` |
-| 📁 [paging_compose](study/paging_compose/src/main/java/com/example/paging_compose/README.md) | Paging 3, PagingSource, collectAsLazyPagingItems | `./gradlew :study:paging_compose:installDebug` |
-| 📁 [pager](study/pager/src/main/java/com/example/pager/README.md) | HorizontalPager, VerticalPager, PagerState | `./gradlew :study:pager:installDebug` |
-| 📁 [pull_to_refresh](study/pull_to_refresh/src/main/java/com/example/pull_to_refresh/README.md) | PullToRefreshBox, 당겨서 새로고침 | `./gradlew :study:pull_to_refresh:installDebug` |
-| 📁 [flow_layout](study/flow_layout/src/main/java/com/example/flow_layout/README.md) | FlowRow, FlowColumn, 동적 래핑 레이아웃 | `./gradlew :study:flow_layout:installDebug` |
-| 📁 [canvas_drawing](study/canvas_drawing/src/main/java/com/example/canvas_drawing/README.md) | Canvas, drawLine, drawCircle, drawArc, Path, Brush | `./gradlew :study:canvas_drawing:installDebug` |
-| 📁 [adaptive_layout](study/adaptive_layout/src/main/java/com/example/adaptive_layout/README.md) | WindowSizeClass, 반응형 레이아웃, NavigationSuiteScaffold | `./gradlew :study:adaptive_layout:installDebug` |
-| 📁 [custom_modifier](study/custom_modifier/src/main/java/com/example/custom_modifier/README.md) | Modifier.Node, Modifier.composed, 조건부 Modifier | `./gradlew :study:custom_modifier:installDebug` |
-| 📁 [drag_and_drop](study/drag_and_drop/src/main/java/com/example/drag_and_drop/README.md) | dragAndDropSource, dragAndDropTarget, ClipData | `./gradlew :study:drag_and_drop:installDebug` |
-| 📁 [permission_handling](study/permission_handling/src/main/java/com/example/permission_handling/README.md) | rememberPermissionState, Accompanist Permissions, Android 14+ | `./gradlew :study:permission_handling:installDebug` |
-| 📁 [focus_management](study/focus_management/src/main/java/com/example/focus_management/README.md) | FocusRequester, FocusManager, IME Actions, 포커스 스타일링 | `./gradlew :study:focus_management:installDebug` |
-| 📁 [notification_integration](study/notification_integration/src/main/java/com/example/notification_integration/README.md) | NotificationChannel, POST_NOTIFICATIONS, Rich 알림, Progress 알림 | `./gradlew :study:notification_integration:installDebug` |
-| 📁 [image_loading](study/image_loading/src/main/java/com/example/image_loading/README.md) | Coil 3.x, AsyncImage, SubcomposeAsyncImage, 캐싱 | `./gradlew :study:image_loading:installDebug` |
-| 📁 [text_typography](study/text_typography/src/main/java/com/example/text_typography/README.md) | AnnotatedString, InlineContent, LinkAnnotation, TextMeasurer | `./gradlew :study:text_typography:installDebug` |
-| 📁 [media3_player](study/media3_player/src/main/java/com/example/media3_player/README.md) | Media3 ExoPlayer + Compose 통합, PlayerView, 생명주기 관리 | `./gradlew :study:media3_player:installDebug` |
-| 📁 [search_bar](study/search_bar/src/main/java/com/example/search_bar/README.md) | Material3 SearchBar, DockedSearchBar, 디바운스, 필터 칩 | `./gradlew :study:search_bar:installDebug` |
-| 📁 [audio_recording](study/audio_recording/src/main/java/com/example/audio_recording/README.md) | MediaRecorder, RECORD_AUDIO 권한, 녹음 상태 관리, 진폭 시각화 | `./gradlew :study:audio_recording:installDebug` |
-| 📁 [dialog_basics](study/dialog_basics/src/main/java/com/example/dialog_basics/README.md) | AlertDialog, Dialog, 상태 기반 다이얼로그, 입력/선택 다이얼로그 | `./gradlew :study:dialog_basics:installDebug` |
-| 📁 [bottom_sheet_basics](study/bottom_sheet_basics/src/main/java/com/example/bottom_sheet_basics/README.md) | ModalBottomSheet 기초, Boolean 상태로 열기/닫기, 액션 시트 패턴 | `./gradlew :study:bottom_sheet_basics:installDebug` |
-| 📁 [bottom_sheet_advanced](study/bottom_sheet_advanced/src/main/java/com/example/bottom_sheet_advanced/README.md) | ModalBottomSheet, BottomSheetScaffold, SheetState, 중첩 시트 | `./gradlew :study:bottom_sheet_advanced:installDebug` |
-| 📁 [camerax_compose](study/camerax_compose/src/main/java/com/example/camerax_compose/README.md) | CameraX + Compose 통합, PreviewView, ImageCapture, 카메라 전환 | `./gradlew :study:camerax_compose:installDebug` |
-| 📁 [slot_api_pattern](study/slot_api_pattern/src/main/java/com/example/slot_api_pattern/README.md) | Slot API 패턴, Compound Component, Scoped Slots, layoutId | `./gradlew :study:slot_api_pattern:installDebug` |
-| 📁 [semantics_accessibility](study/semantics_accessibility/src/main/java/com/example/semantics_accessibility/README.md) | Semantics Tree, contentDescription, mergeDescendants, liveRegion, traversalOrder, 접근성 테스트 | `./gradlew :study:semantics_accessibility:installDebug` |
-| 📁 [visibility_tracking](study/visibility_tracking/src/main/java/com/example/visibility_tracking/README.md) | Visibility Tracking API (2025), onVisibilityChanged, onLayoutRectChanged, 광고 노출 추적 | `./gradlew :study:visibility_tracking:installDebug` |
-| 📁 [textfield_state](study/textfield_state/src/main/java/com/example/textfield_state/README.md) | TextFieldState, InputTransformation, OutputTransformation, Autofill, SecureTextField | `./gradlew :study:textfield_state:installDebug` |
-
-### 각 모듈 구조
-
-```
-study/{module_name}/
-├── README.md       # 개념 설명
-├── Problem.kt      # 이 기술 없이 발생하는 문제
-├── Solution.kt     # 기술을 사용한 해결책
-└── Practice.kt     # 직접 구현해보는 연습
-```
-
----
-
-## 🚧 향후 추가 예정 모듈
-
-> Compose 학습 완성도를 높이기 위해 다음 주제들을 추가할 예정입니다.
-
-### 중간 우선순위 (확장 기능)
-
-| 우선순위 | 모듈명 | 주제 | 설명 |
-|:-------:|--------|------|------|
-| ✅ - | `custom_layout` | 커스텀 레이아웃 | Layout(), MeasurePolicy, SubcomposeLayout |
-| ✅ - | `constraint_layout` | ConstraintLayout | 제약 조건 기반 복잡한 레이아웃 |
-| ✅ - | `animation_advanced` | 고급 애니메이션 | updateTransition, Animatable, 커스텀 스펙 |
-
-### 낮은 우선순위 (심화/선택)
-
-| 우선순위 | 모듈명 | 주제 | 설명 |
-|:-------:|--------|------|------|
-| ✅ - | `hilt_viewmodel` | Hilt + ViewModel | @HiltViewModel, SavedStateHandle |
-| ✅ - | `deep_link` | Deep Link | Navigation + URI 처리 |
-
----
-
-## 📖 Compose 학습 커버리지 분석
-
-> 표준 Compose 교재 목차 기준 현재 커버리지 분석
-
-### ✅ 완벽하게 커버된 영역
-
-| 주제 | 모듈 수 | 비고 |
-|------|:------:|------|
-| 상태 관리 (State Management) | 4개 | remember → rememberSaveable → Hoisting → ViewModel |
-| Side Effects | 5개 | LaunchedEffect, DisposableEffect, SideEffect, rememberCoroutineScope, derivedStateOf |
-| 성능 최적화 | 2개 | Recomposition, Stability |
-| Scaffold/Theme | 1개 | MaterialTheme, Scaffold, TopAppBar, 다크모드 |
-| UI 테스트 | 1개 | ComposeTestRule, Semantics, Finders, Assertions, Actions |
-
-### ⚠️ 부분적으로 커버된 영역
-
-| 주제 | 현황 | 보완 필요 |
+| 모듈 | 설명 | 선행 학습 |
 |------|------|----------|
-| Layout & Modifier | 완료 | Custom Layout, ConstraintLayout 모두 완료 |
-| Navigation | Type-Safe 커버 | Deep Link, Nested Navigation 추가 필요 |
-| ViewModel | 기본 커버 | Hilt 연동, SavedStateHandle 추가 필요 |
+| [kotlin](study/basics/kotlin/README.md) | 람다, 확장 함수, 후행 람다, 널 안전성 | - |
 
-### ❌ 완전히 부족한 영역
+### Level 1: Compose 입문
 
-현재 모든 핵심 영역이 커버되었습니다. 향후 추가 예정 모듈을 확인하세요.
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [compose_introduction](study/basics/compose_introduction/README.md) | Compose 소개, 선언적 UI vs 명령형 UI | kotlin |
+| [composable_function](study/basics/composable_function/README.md) | @Composable 함수의 동작 원리 | compose_introduction |
+| [preview](study/basics/preview/README.md) | @Preview로 UI 미리보기 | composable_function |
 
-### 커버리지 시각화
+### Level 2: 레이아웃 기초
 
-```
-상태 관리     ████████████████████ 100% ✅
-Side Effects  ████████████████████ 100% ✅
-성능 최적화   ████████████████████ 100% ✅
-Preview       ████████████████████ 100% ✅
-애니메이션    ████████████████████ 100% ✅
-Navigation    ████████████████████ 100% ✅
-Layout        ████████████████████ 100% ✅
-Scaffold/Theme████████████████████ 100% ✅
-UI 테스트     ████████████████████ 100% ✅
-상호운용성    ████████████████████ 100% ✅
-```
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [layout_and_modifier](study/layout/layout_and_modifier/README.md) | Column, Row, Box, Modifier 체이닝 | composable_function |
+| [basic_ui_components](study/layout/basic_ui_components/README.md) | Text, Button, TextField, Image 기초 | layout_and_modifier |
+| [text_typography](study/layout/text_typography/README.md) | 텍스트 스타일링, AnnotatedString | basic_ui_components |
+| [rich_text](study/layout/rich_text/README.md) | AnnotatedString 복합 스타일, 클릭 가능 텍스트 | text_typography |
+| [auto_sizing_text](study/layout/auto_sizing_text/README.md) | 컨테이너에 맞는 텍스트 크기 자동 조절 | basic_ui_components |
+| [flow_layout](study/layout/flow_layout/README.md) | FlowRow, FlowColumn 동적 래핑 | layout_and_modifier |
+
+### Level 3: 상태 기초
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [remember](study/state/remember/README.md) | remember, mutableStateOf로 상태 저장 | basic_ui_components |
+| [recomposition](study/state/recomposition/README.md) | Recomposition 동작 이해 | remember |
+| [remember_saveable](study/state/remember_saveable/README.md) | 화면 회전에도 상태 유지 | recomposition |
+
+### Level 4: UI 컴포넌트
+
+#### 4-A: 버튼 & 액션
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [button](study/component/action/button/README.md) | Button, IconButton, FloatingActionButton | remember |
+| [menu](study/component/action/menu/README.md) | DropdownMenu, 컨텍스트 메뉴 | remember |
+
+#### 4-B: 선택
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [checkbox](study/component/selection/checkbox/README.md) | 다중 선택 체크박스 | remember |
+| [radio_button](study/component/selection/radio_button/README.md) | 단일 선택 라디오 버튼 | remember |
+| [switch_component](study/component/selection/switch_component/README.md) | 온/오프 스위치 | remember |
+| [chip](study/component/selection/chip/README.md) | 필터/선택 칩 | remember |
+| [segmented_button](study/component/selection/segmented_button/README.md) | 세그먼트 버튼 그룹 | remember |
+
+#### 4-C: 입력
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [textfield_state](study/component/input/textfield_state/README.md) | TextField 상태 관리, 유효성 검증 | remember |
+| [secure_textfield](study/component/input/secure_textfield/README.md) | 비밀번호 입력 필드 (SecureTextField) | textfield_state |
+| [autofill](study/component/input/autofill/README.md) | 시스템 자동완성 통합 (로그인, 회원가입) | textfield_state |
+| [slider](study/component/input/slider/README.md) | 범위 값 선택 슬라이더 | remember |
+| [date_picker](study/component/input/date_picker/README.md) | 날짜 선택기 | remember |
+| [time_picker](study/component/input/time_picker/README.md) | 시간 선택기 | remember |
+
+#### 4-D: 표시 & 피드백
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [card](study/component/display/card/README.md) | Card로 콘텐츠 그룹화 | button |
+| [divider](study/component/display/divider/README.md) | 구분선 | basic_ui_components |
+| [badge](study/component/display/badge/README.md) | 알림 배지 | basic_ui_components |
+| [tooltip](study/component/display/tooltip/README.md) | 도움말 툴팁 | basic_ui_components |
+| [progress_indicator](study/component/display/progress_indicator/README.md) | 로딩 인디케이터 | basic_ui_components |
+| [dialog](study/component/display/dialog/README.md) | AlertDialog, 커스텀 Dialog | remember |
+
+### Level 5: 리스트 & 검색
+
+#### 5-A: 리스트
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [lazy_list](study/list/lazy_list/README.md) | LazyColumn, LazyRow 기초 | remember |
+| [lazy_grid](study/list/lazy_grid/README.md) | LazyVerticalGrid, LazyHorizontalGrid, StaggeredGrid | lazy_list |
+| [lazy_layouts](study/list/lazy_layouts/README.md) | key, contentType, 성능 최적화 | lazy_list |
+| [pull_to_refresh](study/list/pull_to_refresh/README.md) | 당겨서 새로고침 | lazy_list |
+| [paging_compose](study/list/paging_compose/README.md) | Paging 3 무한 스크롤 | lazy_layouts |
+
+#### 5-B: 스와이프 & 갤러리
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [pager](study/list/pager/README.md) | HorizontalPager, VerticalPager | lazy_list |
+| [carousel](study/list/carousel/README.md) | 가로 스와이프 갤러리 | pager |
+
+#### 5-C: 검색
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [search_bar](study/search/search_bar/README.md) | SearchBar 기초 | textfield_state |
+| [search_bar_advanced](study/search/search_bar_advanced/README.md) | 검색 자동완성, 디바운스 | search_bar |
+
+### Level 6: 앱 구조
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [material_symbols](study/structure/material_symbols/README.md) | Material Symbols 아이콘 시스템 | composable_function |
+| [scaffold](study/structure/scaffold/README.md) | Scaffold 기본 구조 | layout_and_modifier |
+| [window_insets](study/structure/window_insets/README.md) | 시스템 바, Edge-to-Edge | scaffold |
+| [app_bar](study/structure/app_bar/README.md) | TopAppBar, BottomAppBar | window_insets |
+| [navigation_bar](study/structure/navigation_bar/README.md) | 하단 네비게이션 바 | scaffold |
+| [tabs](study/structure/tabs/README.md) | TabRow, 탭 전환 | scaffold |
+| [scaffold_and_theming](study/structure/scaffold_and_theming/README.md) | MaterialTheme, 다크모드 | scaffold |
+| [snackbar](study/structure/snackbar/README.md) | Snackbar 메시지 | scaffold |
+| [bottom_sheet](study/structure/bottom_sheet/README.md) | ModalBottomSheet 기초 | scaffold |
+| [bottom_sheet_advanced](study/structure/bottom_sheet_advanced/README.md) | SheetState, 중첩 시트 | bottom_sheet |
+| [adaptive_layout](study/structure/adaptive_layout/README.md) | 태블릿/폴더블 반응형 레이아웃 | window_insets |
+| [material_expressive](study/structure/material_expressive/README.md) | Material 3 Expressive, 스프링 물리 모션 | scaffold_and_theming |
+
+### Level 7: Side Effects
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [side_effect](study/effect/side_effect/README.md) | Side Effect 개념 이해 | recomposition |
+| [launched_effect](study/effect/launched_effect/README.md) | 비동기 작업 실행 (API 호출 등) | side_effect |
+| [disposable_effect](study/effect/disposable_effect/README.md) | 리소스 정리 (리스너 해제 등) | launched_effect |
+| [remember_coroutine_scope](study/effect/remember_coroutine_scope/README.md) | 이벤트 핸들러에서 코루틴 실행 | launched_effect |
+| [produce_state](study/effect/produce_state/README.md) | 비동기 데이터를 State로 변환 | launched_effect |
+| [effect_handlers_advanced](study/effect/effect_handlers_advanced/README.md) | snapshotFlow, rememberUpdatedState | disposable_effect |
+
+### Level 8: 상태 심화
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [state_hoisting](study/state/state_hoisting/README.md) | 상태 끌어올리기, Stateless 컴포넌트 | remember_saveable |
+| [derived_state_of](study/state/derived_state_of/README.md) | 파생 상태로 불필요한 Recomposition 방지 | state_hoisting |
+| [snapshot_system](study/state/snapshot_system/README.md) | snapshotFlow로 State를 Flow로 변환 | derived_state_of |
+| [stability](study/state/stability/README.md) | @Stable, @Immutable로 성능 최적화 | derived_state_of |
+| [state_management_advanced](study/state/state_management_advanced/README.md) | StateFlow vs SharedFlow vs Channel | stability |
+| [state_restoration_advanced](study/state/state_restoration_advanced/README.md) | 프로세스 종료 후 상태 복원 | state_management_advanced |
+| [retain](study/state/retain/README.md) | 직렬화 없이 Config Change 상태 유지 | remember_saveable |
+
+### Level 9: 네비게이션
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [navigation_basics](study/navigation/navigation_basics/README.md) | Type-Safe Navigation 기초 | state_hoisting |
+| [navigation_3](study/navigation/navigation_3/README.md) | Navigation 3 (2025 최신) | navigation_basics |
+| [deep_link](study/navigation/deep_link/README.md) | 딥링크로 특정 화면 열기 | navigation_basics |
+| [back_handler](study/navigation/back_handler/README.md) | 뒤로가기 커스텀 처리 | navigation_basics |
+| [predictive_back](study/navigation/predictive_back/README.md) | 예측 뒤로가기 제스처 (Android 14+) | back_handler |
+| [navigation_drawer](study/navigation/navigation_drawer/README.md) | 사이드 드로어 메뉴 | navigation_basics |
+| [navigation_rail](study/navigation/navigation_rail/README.md) | 태블릿용 레일 네비게이션 | navigation_basics |
+
+### Level 10: 애니메이션
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [animation_basics](study/animation/animation_basics/README.md) | animate*AsState, AnimatedVisibility | remember |
+| [animation_advanced](study/animation/animation_advanced/README.md) | updateTransition, Animatable | animation_basics |
+| [animation_physics](study/animation/animation_physics/README.md) | spring/decay 물리 기반 애니메이션 | animation_advanced |
+| [animate_bounds](study/animation/animate_bounds/README.md) | LookaheadScope, 레이아웃 애니메이션 | animation_advanced |
+| [shared_element_transition](study/animation/shared_element_transition/README.md) | 화면 전환 시 공유 요소 애니메이션 | animation_advanced, navigation_basics |
+
+### Level 11: 커스텀 레이아웃
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [intrinsic_measurements](study/layout/intrinsic_measurements/README.md) | IntrinsicSize로 자식 크기 동기화 | layout_and_modifier |
+| [constraint_layout](study/layout/constraint_layout/README.md) | 제약 조건 기반 복잡한 레이아웃 | layout_and_modifier |
+| [custom_layout](study/layout/custom_layout/README.md) | Layout() 커스텀 레이아웃 작성 | constraint_layout |
+| [custom_modifier](study/layout/custom_modifier/README.md) | Modifier.Node로 커스텀 Modifier 생성 | custom_layout |
+| [canvas_drawing](study/layout/canvas_drawing/README.md) | Canvas로 커스텀 그래픽 | layout_and_modifier |
+
+### Level 12: 아키텍처
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [view_model](study/architecture/view_model/README.md) | ViewModel + Compose 통합 | state_hoisting |
+| [hilt_viewmodel](study/architecture/hilt_viewmodel/README.md) | @HiltViewModel, 의존성 주입 | view_model |
+| [screen_and_component](study/architecture/screen_and_component/README.md) | Screen vs Component 분리 패턴 | state_hoisting |
+| [slot_api_pattern](study/architecture/slot_api_pattern/README.md) | Slot API로 유연한 컴포넌트 설계 | screen_and_component |
+| [composition_local](study/architecture/composition_local/README.md) | 암시적 데이터 전달 | slot_api_pattern |
+| [unidirectional_data_flow](study/architecture/unidirectional_data_flow/README.md) | 단방향 데이터 흐름 (UDF), MVI 패턴 | view_model |
+
+### Level 13: 제스처 & 인터랙션
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [gesture](study/interaction/gesture/README.md) | 탭, 드래그, 스와이프 제스처 | remember |
+| [gesture_advanced](study/interaction/gesture_advanced/README.md) | pointerInput 고급 제스처, 멀티터치 | gesture |
+| [focus_management](study/interaction/focus_management/README.md) | 포커스 순서, 키보드 처리 | gesture |
+| [drag_and_drop](study/interaction/drag_and_drop/README.md) | 드래그 앤 드롭 기능 | gesture |
+| [haptic_feedback](study/interaction/haptic_feedback/README.md) | 진동/햅틱 피드백 | gesture |
+
+### Level 14: 외부 통합
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [lifecycle_integration](study/integration/lifecycle_integration/README.md) | LifecycleOwner 연동 | disposable_effect |
+| [image_loading](study/integration/image_loading/README.md) | Coil로 이미지 로딩 | basic_ui_components |
+| [media3_player](study/integration/media3_player/README.md) | ExoPlayer + Compose | lifecycle_integration |
+| [interoperability](study/integration/interoperability/README.md) | View ↔ Compose 상호운용 | lifecycle_integration |
+| [camerax_compose](study/integration/camerax_compose/README.md) | CameraX + Compose | interoperability |
+
+### Level 15: 시스템 통합
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [permission_handling](study/system/permission_handling/README.md) | 런타임 권한 요청 | launched_effect |
+| [notification_integration](study/system/notification_integration/README.md) | 알림 생성 및 처리 | permission_handling |
+| [audio_recording](study/system/audio_recording/README.md) | 오디오 녹음 | permission_handling |
+
+### Level 16: 테스트 & 성능
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [semantics_accessibility](study/testing/semantics_accessibility/README.md) | 접근성, 스크린 리더 지원 | basic_ui_components |
+| [compose_testing](study/testing/compose_testing/README.md) | UI 테스트, Semantics | semantics_accessibility |
+| [compose_preview_testing](study/testing/compose_preview_testing/README.md) | @PreviewParameter로 다중 Preview 테스트 | compose_testing |
+| [screenshot_testing](study/testing/screenshot_testing/README.md) | 스크린샷 테스트, Paparazzi | compose_testing |
+| [compose_compiler_metrics](study/testing/compose_compiler_metrics/README.md) | 컴파일러 리포트 분석 | stability |
+| [baseline_profiles](study/testing/baseline_profiles/README.md) | 앱 시작 성능 최적화 | compose_compiler_metrics |
+| [pausable_composition](study/testing/pausable_composition/README.md) | Jank 방지, Composition 일시중단 | baseline_profiles |
+| [visibility_tracking](study/testing/visibility_tracking/README.md) | 화면 노출 추적 (광고, 분석) | lazy_layouts |
+| [strong_skipping_mode](study/testing/strong_skipping_mode/README.md) | Strong Skipping Mode 성능 최적화 | stability |
+
+### Level 17: 멀티플랫폼
+
+| 모듈 | 설명 | 선행 학습 |
+|------|------|----------|
+| [compose_multiplatform_intro](study/multiplatform/compose_multiplatform_intro/README.md) | Compose Multiplatform 입문, expect/actual 패턴 | composable_function |
+| [desktop_extensions](study/multiplatform/desktop_extensions/README.md) | Desktop 전용 API (MenuBar, Tray, KeyShortcut) | compose_multiplatform_intro |
+| [web_wasm](study/multiplatform/web_wasm/README.md) | Kotlin/Wasm으로 웹에서 Compose 실행 | compose_multiplatform_intro |
 
 ---
 
-## 공식 학습 리소스
+## 카테고리별 인덱스
+
+> 특정 컴포넌트를 찾고 있다면 여기서 검색하세요
+
+### Actions (액션)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [button](study/component/action/button/README.md) | 클릭 가능한 버튼이 필요할 때 |
+| [menu](study/component/action/menu/README.md) | 드롭다운 메뉴가 필요할 때 |
+| [segmented_button](study/component/selection/segmented_button/README.md) | 여러 옵션 중 하나를 선택할 때 |
+
+### Communication (알림/피드백)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [badge](study/component/display/badge/README.md) | 아이콘에 알림 숫자를 표시할 때 |
+| [progress_indicator](study/component/display/progress_indicator/README.md) | 로딩 상태를 보여줄 때 |
+| [snackbar](study/structure/snackbar/README.md) | 짧은 메시지를 하단에 표시할 때 |
+| [tooltip](study/component/display/tooltip/README.md) | 요소에 대한 추가 설명이 필요할 때 |
+
+### Containment (컨테이너)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [app_bar](study/structure/app_bar/README.md) | 화면 상단에 제목과 액션을 배치할 때 |
+| [bottom_sheet](study/structure/bottom_sheet/README.md) | 하단에서 올라오는 추가 콘텐츠가 필요할 때 |
+| [card](study/component/display/card/README.md) | 관련 정보를 그룹화할 때 |
+| [carousel](study/list/carousel/README.md) | 가로 스와이프 갤러리가 필요할 때 |
+| [dialog](study/component/display/dialog/README.md) | 사용자 확인이나 입력이 필요할 때 |
+| [divider](study/component/display/divider/README.md) | 콘텐츠 영역을 구분할 때 |
+| [lazy_list](study/list/lazy_list/README.md) | 긴 목록을 효율적으로 표시할 때 |
+| [scaffold](study/structure/scaffold/README.md) | 앱 화면의 기본 구조를 잡을 때 |
+
+### Navigation (네비게이션)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [navigation_basics](study/navigation/navigation_basics/README.md) | 화면 간 이동이 필요할 때 |
+| [navigation_bar](study/structure/navigation_bar/README.md) | 하단 탭 네비게이션이 필요할 때 |
+| [navigation_drawer](study/navigation/navigation_drawer/README.md) | 사이드 메뉴가 필요할 때 |
+| [navigation_rail](study/navigation/navigation_rail/README.md) | 태블릿에서 좌측 네비게이션이 필요할 때 |
+| [back_handler](study/navigation/back_handler/README.md) | 뒤로가기 커스텀 처리가 필요할 때 |
+| [predictive_back](study/navigation/predictive_back/README.md) | Android 14+ 예측 뒤로가기가 필요할 때 |
+| [search_bar](study/search/search_bar/README.md) | 기본 검색 기능이 필요할 때 |
+| [search_bar_advanced](study/search/search_bar_advanced/README.md) | 검색 기록, 디바운스 등 고급 기능이 필요할 때 |
+| [tabs](study/structure/tabs/README.md) | 상단 탭으로 콘텐츠를 전환할 때 |
+
+### Selection (선택)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [checkbox](study/component/selection/checkbox/README.md) | 여러 항목을 다중 선택할 때 |
+| [chip](study/component/selection/chip/README.md) | 필터나 태그를 선택할 때 |
+| [date_picker](study/component/input/date_picker/README.md) | 날짜를 선택할 때 |
+| [radio_button](study/component/selection/radio_button/README.md) | 여러 항목 중 하나만 선택할 때 |
+| [slider](study/component/input/slider/README.md) | 범위 내 값을 선택할 때 |
+| [switch_component](study/component/selection/switch_component/README.md) | 온/오프 토글이 필요할 때 |
+| [time_picker](study/component/input/time_picker/README.md) | 시간을 선택할 때 |
+
+### Text Input (텍스트 입력)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [textfield_state](study/component/input/textfield_state/README.md) | 텍스트 입력 필드가 필요할 때 |
+| [secure_textfield](study/component/input/secure_textfield/README.md) | 비밀번호 입력 필드가 필요할 때 |
+| [autofill](study/component/input/autofill/README.md) | 로그인/회원가입 자동완성이 필요할 때 |
+
+### Text & Typography (텍스트 스타일링)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [text_typography](study/layout/text_typography/README.md) | 텍스트 기본 스타일링이 필요할 때 |
+| [rich_text](study/layout/rich_text/README.md) | 부분 스타일, 클릭 가능한 텍스트가 필요할 때 |
+| [auto_sizing_text](study/layout/auto_sizing_text/README.md) | 컨테이너에 맞게 텍스트 크기를 자동 조절할 때 |
+
+### Gestures (제스처)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [gesture](study/interaction/gesture/README.md) | 기본 탭, 드래그, 스와이프가 필요할 때 |
+| [gesture_advanced](study/interaction/gesture_advanced/README.md) | 멀티터치, 복잡한 제스처가 필요할 때 |
+| [drag_and_drop](study/interaction/drag_and_drop/README.md) | 드래그 앤 드롭이 필요할 때 |
+| [haptic_feedback](study/interaction/haptic_feedback/README.md) | 터치 진동 피드백이 필요할 때 |
+
+### Icons (아이콘)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [material_symbols](study/structure/material_symbols/README.md) | Material Symbols 아이콘 시스템이 필요할 때 |
+
+### Multiplatform (멀티플랫폼)
+
+| 모듈 | 언제 사용? |
+|------|-----------|
+| [compose_multiplatform_intro](study/multiplatform/compose_multiplatform_intro/README.md) | Android/iOS/Desktop/Web 코드 공유가 필요할 때 |
+| [desktop_extensions](study/multiplatform/desktop_extensions/README.md) | Desktop 앱에 메뉴바, 트레이, 단축키가 필요할 때 |
+| [web_wasm](study/multiplatform/web_wasm/README.md) | 웹 브라우저에서 Compose를 실행할 때 |
+
+---
+
+## 키워드로 찾기
+
+> "이런 상황인데 뭘 써야 하지?"
+
+### 상태 & 데이터
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| 상태 저장 | [remember](study/state/remember/README.md), [remember_saveable](study/state/remember_saveable/README.md) |
+| 화면 회전 | [remember_saveable](study/state/remember_saveable/README.md), [retain](study/state/retain/README.md), [state_restoration_advanced](study/state/state_restoration_advanced/README.md) |
+| 상태 끌어올리기 | [state_hoisting](study/state/state_hoisting/README.md) |
+| 파생 상태 | [derived_state_of](study/state/derived_state_of/README.md) |
+| snapshotFlow | [snapshot_system](study/state/snapshot_system/README.md), [effect_handlers_advanced](study/effect/effect_handlers_advanced/README.md) |
+| Flow/Channel | [state_management_advanced](study/state/state_management_advanced/README.md) |
+
+### 비동기 & Side Effect
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| API 호출 | [launched_effect](study/effect/launched_effect/README.md), [remember_coroutine_scope](study/effect/remember_coroutine_scope/README.md) |
+| 리스너 등록/해제 | [disposable_effect](study/effect/disposable_effect/README.md) |
+| 코루틴 실행 | [remember_coroutine_scope](study/effect/remember_coroutine_scope/README.md) |
+| 비동기 → State | [produce_state](study/effect/produce_state/README.md) |
+| snapshotFlow | [effect_handlers_advanced](study/effect/effect_handlers_advanced/README.md) |
+
+### 리스트 & 스크롤
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| 긴 목록 | [lazy_list](study/list/lazy_list/README.md), [lazy_grid](study/list/lazy_grid/README.md), [lazy_layouts](study/list/lazy_layouts/README.md) |
+| 무한 스크롤 | [paging_compose](study/list/paging_compose/README.md) |
+| 페이지 스와이프 | [pager](study/list/pager/README.md), [carousel](study/list/carousel/README.md) |
+| 당겨서 새로고침 | [pull_to_refresh](study/list/pull_to_refresh/README.md) |
+| 화면 노출 추적 | [visibility_tracking](study/testing/visibility_tracking/README.md) |
+
+### 네비게이션
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| 화면 이동 | [navigation_basics](study/navigation/navigation_basics/README.md), [navigation_3](study/navigation/navigation_3/README.md) |
+| 딥링크 | [deep_link](study/navigation/deep_link/README.md) |
+| 뒤로가기 | [back_handler](study/navigation/back_handler/README.md), [predictive_back](study/navigation/predictive_back/README.md) |
+| 예측 뒤로가기 | [predictive_back](study/navigation/predictive_back/README.md) |
+| 하단 탭 | [navigation_bar](study/structure/navigation_bar/README.md) |
+| 사이드 메뉴 | [navigation_drawer](study/navigation/navigation_drawer/README.md) |
+
+### 애니메이션
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| 값 애니메이션 | [animation_basics](study/animation/animation_basics/README.md) |
+| 복잡한 전환 | [animation_advanced](study/animation/animation_advanced/README.md) |
+| 물리 애니메이션 | [animation_physics](study/animation/animation_physics/README.md) |
+| spring/decay | [animation_physics](study/animation/animation_physics/README.md) |
+| 레이아웃 변경 | [animate_bounds](study/animation/animate_bounds/README.md) |
+| 화면 전환 효과 | [shared_element_transition](study/animation/shared_element_transition/README.md) |
+
+### 성능 & 테스트
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| Recomposition 최적화 | [stability](study/state/stability/README.md), [derived_state_of](study/state/derived_state_of/README.md) |
+| 컴파일러 분석 | [compose_compiler_metrics](study/testing/compose_compiler_metrics/README.md) |
+| 앱 시작 속도 | [baseline_profiles](study/testing/baseline_profiles/README.md) |
+| Jank 방지 | [pausable_composition](study/testing/pausable_composition/README.md) |
+| UI 테스트 | [compose_testing](study/testing/compose_testing/README.md) |
+| Preview 테스트 | [compose_preview_testing](study/testing/compose_preview_testing/README.md) |
+| 스크린샷 테스트 | [screenshot_testing](study/testing/screenshot_testing/README.md) |
+
+### 외부 연동
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| 이미지 로딩 | [image_loading](study/integration/image_loading/README.md) |
+| 비디오 재생 | [media3_player](study/integration/media3_player/README.md) |
+| 카메라 | [camerax_compose](study/integration/camerax_compose/README.md) |
+| 권한 요청 | [permission_handling](study/system/permission_handling/README.md) |
+| 알림 | [notification_integration](study/system/notification_integration/README.md) |
+| 기존 View 사용 | [interoperability](study/integration/interoperability/README.md) |
+
+### 텍스트 스타일링
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| 부분 스타일 | [rich_text](study/layout/rich_text/README.md) |
+| AnnotatedString | [rich_text](study/layout/rich_text/README.md), [text_typography](study/layout/text_typography/README.md) |
+| 클릭 가능한 텍스트 | [rich_text](study/layout/rich_text/README.md) |
+| 자동 크기 조절 | [auto_sizing_text](study/layout/auto_sizing_text/README.md) |
+
+### 제스처 & 인터랙션
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| 멀티터치 | [gesture_advanced](study/interaction/gesture_advanced/README.md) |
+| 커스텀 제스처 | [gesture_advanced](study/interaction/gesture_advanced/README.md) |
+| 진동 피드백 | [haptic_feedback](study/interaction/haptic_feedback/README.md) |
+| pointerInput | [gesture_advanced](study/interaction/gesture_advanced/README.md) |
+
+### 레이아웃 심화
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| IntrinsicSize | [intrinsic_measurements](study/layout/intrinsic_measurements/README.md) |
+| 자식 크기 동기화 | [intrinsic_measurements](study/layout/intrinsic_measurements/README.md) |
+| 커스텀 레이아웃 | [custom_layout](study/layout/custom_layout/README.md) |
+
+### 멀티플랫폼
+
+| 키워드 | 관련 모듈 |
+|--------|-----------|
+| Desktop 앱 | [desktop_extensions](study/multiplatform/desktop_extensions/README.md) |
+| 웹 앱 | [web_wasm](study/multiplatform/web_wasm/README.md) |
+| 코드 공유 | [compose_multiplatform_intro](study/multiplatform/compose_multiplatform_intro/README.md) |
+| MenuBar/Tray | [desktop_extensions](study/multiplatform/desktop_extensions/README.md) |
+| Kotlin/Wasm | [web_wasm](study/multiplatform/web_wasm/README.md) |
+
+---
+
+## 공식 문서 링크
 
 ### Google 공식 코스
-- [Android Basics with Compose](https://developer.android.com/courses/android-basics-compose/course) - 프로그래밍 경험 없이 시작 가능, 100시간+ 분량
-- [Jetpack Compose for Android Developers](https://developer.android.com/courses/jetpack-compose/course) - 기존 Android 개발자용
+- [Android Basics with Compose](https://developer.android.com/courses/android-basics-compose/course) - 입문자용
+- [Jetpack Compose for Android Developers](https://developer.android.com/courses/jetpack-compose/course) - 기존 개발자용
 
 ### 공식 문서
+- [Compose Documentation](https://developer.android.com/develop/ui/compose/documentation) - 전체 문서
 - [State and Jetpack Compose](https://developer.android.com/develop/ui/compose/state)
 - [Side-effects in Compose](https://developer.android.com/develop/ui/compose/side-effects)
-- [Lifecycle of composables](https://developer.android.com/develop/ui/compose/lifecycle)
-- [Jetpack Compose Performance](https://developer.android.com/develop/ui/compose/performance)
-- [Animation in Compose](https://developer.android.com/develop/ui/compose/animation/introduction)
-- [Testing your Compose layout](https://developer.android.com/develop/ui/compose/testing)
+- [Compose Performance](https://developer.android.com/develop/ui/compose/performance)
 
-### 커뮤니티 리소스
-- [Android Developer Roadmap](https://github.com/skydoves/android-developer-roadmap) - 시각적 학습 경로
-- [Compose Performance 가이드](https://github.com/skydoves/compose-performance) - 성능 최적화 모음
+### Material Design 3
+- [M3 Components](https://m3.material.io/components) - 컴포넌트 가이드
 
 ---
 
-## 참고 자료 (이 문서 작성에 사용된 출처)
+## 기여하기
 
-- [Jetpack Compose Roadmap - Android Developers](https://developer.android.com/jetpack/androidx/compose-roadmap)
-- [Jetpack Compose Complete Roadmap for 2025](https://medium.com/@ami0275/jetpack-compose-complete-roadmap-for-2025-eec23b780d84)
-- [Side-effects in Compose - Android Developers](https://developer.android.com/develop/ui/compose/side-effects)
-- [Understanding Execution Order in Jetpack Compose - droidcon 2025](https://www.droidcon.com/2025/04/22/understanding-execution-order-in-jetpack-compose-disposableeffect-launchedeffect-and-composables/)
-- [Stability in Compose - Android Developers](https://developer.android.com/develop/ui/compose/performance/stability)
-- [LaunchedEffect vs rememberCoroutineScope - droidcon](https://www.droidcon.com/2023/05/07/launchedeffect-vs-remembercoroutinescope-in-jetpack-compose/)
-- [Navigation with Compose - Android Developers](https://developer.android.com/develop/ui/compose/navigation)
-- [Jetpack Compose Stability Explained - Android Developers Medium](https://medium.com/androiddevelopers/jetpack-compose-stability-explained-79c10db270c8)
+학습 모듈 추가나 개선은 언제나 환영합니다!

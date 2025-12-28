@@ -59,3 +59,7 @@ Thumbs.db
 
 # Log Files
 *.log
+
+# Claude Code
+.claude/
+CLAUDE.md
